@@ -143,12 +143,10 @@ function PostDetail({ id }: { id: string }) {
           </div>
           <p>{post['Preferred way of contact']}</p>
           <p>{post['Contact info']}</p>
-        </div>
+                </div>
         <div className="max-w-sm w-full rounded-md border flex flex-col gap-3 border-gray-400 p-3">
           <div className="flex items-center justify-between w-full gap-5">
-            <h2 className="text-lg font-semibold">
-              Frequency of domestic violence
-            </h2>
+            <h2 className="text-lg font-semibold">Frequency of Incidents</h2>
             <CalendarDays className="text-gray-700" />
           </div>
           <p>{post['Frequency of domestic violence']}</p>
@@ -157,7 +155,7 @@ function PostDetail({ id }: { id: string }) {
         <div className="max-w-sm w-full rounded-md border flex flex-col gap-3 border-gray-400 p-3">
           <div className="flex items-center justify-between w-full gap-5">
             <h2 className="text-lg font-semibold">
-              Nature of domestic violence
+              Nature of Incident
             </h2>
             <PersonStanding className="text-gray-700" />
           </div>

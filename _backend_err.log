@@ -1,0 +1,31 @@
+Internal Server Error: /get-admin-posts
+[29/Aug/2026 20:48:46,594] - Broken pipe from ('127.0.0.1', 55285)
+Unauthorized: /auth/me
+[29/Aug/2026 20:49:15] "GET /auth/me HTTP/1.1" 401 31
+Internal Server Error: /auth/login
+[29/Aug/2026 20:49:16,394] - Broken pipe from ('127.0.0.1', 55362)
+C:\Users\Winstone\Desktop\Winstone\Samsung AI\Project Capstone\SupportSafe\backend_django\haven\utils\text_llm.py:14: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+[29/Aug/2026 20:49:28] "POST /text-generation HTTP/1.1" 200 3107
+[29/Aug/2026 20:49:36] "POST /text-decomposition HTTP/1.1" 200 464
+[29/Aug/2026 20:49:49] "GET /poem-generation?text=hope+and+strength HTTP/1.1" 200 341
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+Internal Server Error: /generate-image
+[29/Aug/2026 20:49:51] "POST /generate-image HTTP/1.1" 500 1937
+Internal Server Error: /encode
+[29/Aug/2026 20:49:52] "POST /encode?text=secret-help-msg HTTP/1.1" 500 210
+Internal Server Error: /save-extracted-data
+[29/Aug/2026 20:50:22,105] - Broken pipe from ('127.0.0.1', 58806)
+Internal Server Error: /get-admin-posts
+[29/Aug/2026 20:50:52,521] - Broken pipe from ('127.0.0.1', 58864)
+Internal Server Error: /find-match
+[29/Aug/2026 20:51:26] "GET /find-match?info=a+tall+man+in+a+blue+jacket HTTP/1.1" 500 1920
+Internal Server Error: /generate-image
+[29/Aug/2026 20:51:37] "POST /generate-image HTTP/1.1" 500 1938

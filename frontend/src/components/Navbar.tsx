@@ -10,12 +10,12 @@ function NavContent({ pathname }: { pathname: string }) {
   const isActive = (href: string) => pathname === href;
 
   return (
-    <nav className="w-full h-16 p-4 flex items-center justify-between border-b shadow-sm">
+    <nav className="w-full h-16 px-4 sm:px-6 flex items-center justify-between border-b shadow-sm bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
       <Link
         href={'/'}
-        className="font-bold text-2xl tracking-wide hover:text-blue-500 transition-colors duration-200"
+        className="font-bold text-2xl tracking-wide text-blue-700 hover:text-indigo-600 transition-colors duration-200"
       >
-        Support<span className="text-blue-700">Safe</span>
+        Support<span className="text-indigo-700">Safe</span>
       </Link>
       <div className="flex items-center justify-center gap-10 font-medium text-gray-600">
         <Link

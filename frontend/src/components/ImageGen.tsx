@@ -14,7 +14,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import axios from 'axios';
 import { useState } from 'react';
 import Image from 'next/image';
@@ -50,6 +49,7 @@ export default function ImageGen({
   const [imageOptions, setImageOptions] = useState<string[] | null>(null); // To hold the array of image URLs
   const [selectedImage, setSelectedImage] = useState<string | null>(null); // To store the selected image
   const [isLoading, setIsLoading] = useState<boolean>(false); // Loading state for images
+  const [genError, setGenError] = useState<string>(''); // Friendly error message
   const [selectedText, setSelectedText] = useState<string>('');
   const [selectedModel, setSelectedModel] = useState<string>(''); // Default model
 
@@ -62,12 +62,16 @@ export default function ImageGen({
   ];
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     setIsLoading(true); // Start loading state
+    setGenError(''); // Clear previous errors
     try {
       const res = await axios.post('/api/generate-image', data);
-      console.log('Image options generated:', res.data.images); // Assuming API returns images array
       setImageOptions(res.data.images); // Set multiple image options
     } catch (error) {
       console.error('Error generating images:', error);
+      const detail =
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (error as any)?.response?.data?.error || 'Image generation failed. Please try again.';
+      setGenError(detail);
     } finally {
       setIsLoading(false); // End loading state
     }
@@ -82,14 +86,10 @@ export default function ImageGen({
     setResImage(imageUrl); // Update the parent component with the final image URL
   };
 
-  const handleTextOptionClick = (text: string) => {
-    setSelectedText(text); // Set the selected text
-    if (text === textGemma) {
-      setSelectedModel('gemma'); // Set the model to Gemma
-    } else {
-      setSelectedModel('gemini'); // Set the model to Gemini
-    }
-    form.setValue('generatedText', text); // Update the form field with the selected text
+    const handleTextOptionClick = (selected: string) => {
+    setSelectedText(selected);
+    setSelectedModel(selected === textGemma ? 'gemma' : 'gemini');
+    form.setValue('generatedText', selected);
   };
 
   return (
@@ -101,52 +101,54 @@ export default function ImageGen({
         <FormField
           control={form.control}
           name="generatedText"
-          render={({ field }) => (
+          render={() => (
             <FormItem>
               <FormLabel>Generated Text</FormLabel>
               <FormControl>
                 {!selectedText ? (
-                  <div className="space-x-2 flex items-center w-full ">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
                     {[text, textGemma].map((textOption, index) => (
                       <div
                         key={index}
                         onClick={() => handleTextOptionClick(textOption)}
-                        className="cursor-pointer w-full bg-slate-200 p-2 rounded-md hover:bg-slate-300"
+                        className="cursor-pointer bg-slate-100 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 p-3 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 hover:border-slate-300 transition duration-150"
                       >
-                        <div className="flex flex-col items-center pt-4 justify-between h-[330px]">
-                          <span>{textOption}</span>
-                          <span
-                            className={`${
-                              textOption === textGemma
-                                ? 'bg-gradient-to-tr from-orange-500 to-orange-300 text-white'
-                                : 'bg-gradient-to-tr from-blue-500 to-blue-400 text-white'
-                            } text-xs rounded-full py-1 px-2 max-w-[60px] mt-3`}
-                          >
-                            {textOption === textGemma ? 'Gemma' : 'Gemini'}
-                          </span>
-                        </div>
+                        <p className="text-sm text-slate-700 dark:text-slate-200 line-clamp-4 whitespace-pre-wrap">
+                          {textOption}
+                        </p>
+                        <span
+                          className={`${
+                            textOption === textGemma
+                              ? 'bg-gradient-to-tr from-orange-500 to-orange-300 text-white'
+                              : 'bg-gradient-to-tr from-blue-500 to-blue-400 text-white'
+                          } text-xs rounded-full py-0.5 px-2 mt-2 inline-block`}
+                        >
+                          {textOption === textGemma ? 'Gemma' : 'Gemini'}
+                        </span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <Textarea {...field} value={selectedText} rows={8} />
+                  <div className="relative w-full rounded-md border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 p-3">
+                    <p className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words max-h-56 overflow-y-auto pr-2">
+                      {selectedText}
+                    </p>
+                    <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 mt-2 pt-2 border-t border-slate-200 dark:border-slate-600 justify-end">
+                      <SparklesIcon size={12} />
+                      <span>
+                        Generated with{' '}
+                        <Link
+                          href="https://gemini.google.com/"
+                          target="_blank"
+                          className="underline underline-offset-2 text-blue-600 dark:text-blue-400"
+                        >
+                          {selectedModel === 'gemma' ? 'Gemma' : 'Gemini'}
+                        </Link>
+                      </span>
+                    </div>
+                  </div>
                 )}
               </FormControl>
-              {selectedText && (
-                <div className="flex items-center gap-2 font-medium text-slate-700 float-right text-sm">
-                  <SparklesIcon size={18} />
-                  <h1>
-                    Generated with{' '}
-                    <Link
-                      href={'https://gemini.google.com/'}
-                      target="_blank"
-                      className="underline underline-offset-2 text-blue-600"
-                    >
-                      {selectedModel === 'gemma' ? 'Gemma' : 'Gemini'}
-                    </Link>
-                  </h1>
-                </div>
-              )}
               <FormMessage />
             </FormItem>
           )}
@@ -181,6 +183,18 @@ export default function ImageGen({
             </FormItem>
           )}
         />
+
+        {genError && (
+          <div className="rounded-lg border border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-900/30 px-4 py-3 text-sm text-red-700 dark:text-red-300">
+            {genError}
+            {genError.includes('RESOURCE_EXHAUSTED') || genError.includes('quota') ? (
+              <p className="mt-1 text-xs opacity-80">
+                The free-tier Gemini image quota is exhausted. Try again later or enable billing on
+                your Google AI Studio key.
+              </p>
+            ) : null}
+          </div>
+        )}
 
         <Button type="submit" className="w-full">
           Generate Images

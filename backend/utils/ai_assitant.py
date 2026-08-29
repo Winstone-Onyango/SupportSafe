@@ -54,7 +54,7 @@ class AI_Assistant:
         self.full_transcript.append({"role": "user", "content": text})
         genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-        model = genai.GenerativeModel("gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-3.6-flash")
         ai_response = model.generate_content(f"You are my theraist")
         print(ai_response.text)
 

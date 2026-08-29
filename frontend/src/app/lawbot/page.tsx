@@ -24,9 +24,9 @@ const promptSuggestions = [
     text: 'Kenyan Penal Code Section 4 (Chapter 63)',
     icon: <Triangle className="text-gray-700" size={16} />,
   },
-  { text: 'Women Rights', icon: <Check className="text-gray-700" size={16} /> },
+  { text: 'Human Rights', icon: <Check className="text-gray-700" size={16} /> },
   {
-    text: 'Women Safety',
+    text: 'Personal Safety',
     icon: <Fingerprint className="text-gray-700" size={16} />,
   },
 ];

@@ -1,27 +1,19 @@
 import os
 import pickle
-import logging  
+import time
+
 from bson import Binary
 from dotenv import load_dotenv
 from pymongo import MongoClient
-# Load environment variables
 from pymongo.operations import SearchIndexModel
-# from sentence_transformers import SentenceTransformer
 
 from backend.utils.embedding import generate_text_embedding
-from backend.logger import CustomFormatter
 
 load_dotenv()
-print("MONGO_ENDPOINT:", os.getenv("MONGO_ENDPOINT"))
 
 # Initialize db_client as None globally to cache the connection
 db_client = None
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-handler = logging.StreamHandler()
-handler.setFormatter(CustomFormatter())
-logger.addHandler(handler)
 
 def get_database():
     """
@@ -31,20 +23,19 @@ def get_database():
     global db_client
     if db_client is None:
         try:
-            # Create a single MongoClient instance
             db_client = MongoClient(os.getenv("MONGO_ENDPOINT"))
-            logger.info("Connected to the database")    
+            print("Connected to the database")
         except Exception as e:
             print("Error connecting to the database:", e)
             return None
-    return db_client["SheBuilds"]
+    return db_client[os.getenv("MONGO_DB_NAME", "SheBuilds")]
 
 
 def insert_data_into_db(
     name, location, contact_info, severity, culprit, relationship_to_culprit, other_info
 ):
     """
-    Inserts a document into the 'posts' collection of the MongoDB database.
+    Inserts a document into the 'complains2' collection of the MongoDB database.
     Reuses the cached database connection.
     """
     db = get_database()
@@ -66,7 +57,6 @@ def insert_data_into_db(
     culprit_embedding = generate_text_embedding(culprit)
     document["culprit_embedding"] = culprit_embedding
     try:
-        # Insert the document into the collection
         result = collection.insert_one(document)
         print(f"Inserted document with ID: {result.inserted_id}")
         return result.inserted_id
@@ -83,23 +73,30 @@ def insert_data_into_db(
 # insert_data_into_db("Charlie", {"lat": 37.7749, "lng": -122.4194}, "Medium", "Faulty wiring", "Needs inspection")
 
 
+# Large documents are split into chunks so that each embedding call stays well
+# within the model's input limits (and free-tier per-request caps). Each chunk
+# is stored as its own document in the 'doc_embedding' collection.
+def _chunk_text(text, size=1200):
+    text = (text or "").strip()
+    if not text:
+        return []
+    return [text[i : i + size] for i in range(0, len(text), size)]
+
+
 # Function to upload embeddings to MongoDB
 def upload_embeddings_to_mongo(file_contents):
     db = get_database()
     collection = db["doc_embedding"]
     for filename, content in file_contents:
-        # Generate embeddings for the document content
-        embedding = generate_text_embedding(content)
-
-        # Prepare the document to insert into MongoDB
-        doc = {
-            "filename": filename,
-            "embedding": Binary(pickle.dumps(embedding)),  # Store as a binary object
-            "content": content[
-                :500
-            ],  # Store the first 500 characters of the content for preview
-        }
-
-        # Insert the document into the MongoDB collection
-        collection.insert_one(doc)
-        print(f"Uploaded {filename} to MongoDB.")
+        chunks = _chunk_text(content)
+        for idx, chunk in enumerate(chunks):
+            embedding = generate_text_embedding(chunk)
+            doc = {
+                "filename": filename,
+                "chunk_index": idx,
+                "embedding": Binary(pickle.dumps(embedding)),
+                "content": chunk[:500],
+            }
+            collection.insert_one(doc)
+            print(f"Uploaded {filename} chunk {idx} to MongoDB.")
+            time.sleep(0.6)  # small delay to respect free-tier rate limits

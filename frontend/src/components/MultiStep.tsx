@@ -32,7 +32,7 @@ export default function HorizontalLinearStepper({
           const response = await fetch('/api/chat', {
             method: 'POST',
             body: JSON.stringify({
-              userInput: 'tell me 10 lines poem on women equality',
+              userInput: 'tell me 10 lines poem on equality and safety for everyone',
             }),
             headers: { 'Content-Type': 'application/json' },
           });

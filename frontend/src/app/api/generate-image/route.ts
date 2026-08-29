@@ -28,11 +28,13 @@ export async function POST(req: Request) {
     // console.log('Image Generation /api/generate-image:', res.data);
     const imageUrls = res.data.image_urls; // Array of image URLs
     return NextResponse.json({ images: imageUrls }, { status: 200 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Image generation failed:', error);
-    return NextResponse.json(
-      { error: 'Failed to generate images' },
-      { status: 500 }
-    );
+    let detail = 'Failed to generate images';
+    if (axios.isAxiosError(error)) {
+      const backendDetail = error.response?.data?.detail;
+      if (typeof backendDetail === 'string') detail = backendDetail;
+    }
+    return NextResponse.json({ error: detail }, { status: 500 });
   }
 }

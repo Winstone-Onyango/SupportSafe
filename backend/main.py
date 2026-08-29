@@ -1,19 +1,17 @@
 # Built-in libraries
-import base64
-import json
 import logging
 import os
 
 # External dependencies
-import boto3
 from bson import ObjectId
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 
 from backend.db import get_database, upload_embeddings_to_mongo
+from backend.images import generate_image_urls
 from backend.logger import CustomFormatter
-from backend.schema import FileContent, PostInfo
+from backend.schema import PostInfo
 from backend.utils.common import (load_image_from_url_or_file,
                                   read_files_from_directory,
                                   serialize_object_id)
@@ -23,8 +21,7 @@ from backend.utils.steganography import (decode_text_from_image,
                                          encode_text_in_image)
 from backend.utils.text_llm import (create_poem, decompose_user_text,
                                     expand_user_text_using_gemini,
-                                    expand_user_text_using_gemma,
-                                    text_to_image)
+                                    expand_user_text_using_gemma)
 from backend.utils.twitter import send_message_to_twitter
 
 logger = logging.getLogger(__name__)
@@ -56,20 +53,6 @@ def initialize_database():
 async def startup_event():
     initialize_database()
 
-# Environment and AWS setup
-AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-AWS_REGION = os.getenv("AWS_REGION")
-S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME", "shebuilds-womentechmakers")
-
-s3_client = boto3.client(
-    "s3",
-    aws_access_key_id=AWS_ACCESS_KEY_ID,
-    aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-    region_name=AWS_REGION,
-)
-bedrock_client = boto3.client("bedrock-runtime", region_name=AWS_REGION)
-
 # API Endpoints
 @app.post("/text-generation")
 async def get_post_and_expand_its_content(post_info: PostInfo):
@@ -96,8 +79,8 @@ async def get_post_and_expand_its_content(post_info: PostInfo):
 async def create_image_from_prompt(input_data: str):
     """Generate an image based on a text prompt."""
     try:
-        text_to_image(input_data)
-        return {"received_text": input_data}
+        image_urls = generate_image_urls(input_data)
+        return {"image_urls": image_urls}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating image: {e}")
 
@@ -237,47 +220,11 @@ async def upload_embeddings():
 
 @app.post("/generate-image")
 async def generate_image(data: dict):
-    """Generate an image based on a text prompt using Amazon Bedrock and store it in S3."""
+    """Generate an image based on a text prompt using Gemini and store it in Supabase."""
     try:
-        # Payload for image generation
         prompt = data.get("prompt")
         print("Prompt: ", prompt)
-        body = json.dumps({
-            "taskType": "TEXT_IMAGE",
-            "textToImageParams": {"text": prompt},
-            "imageGenerationConfig": {
-                "numberOfImages": 3,
-                "quality": "standard",
-                "height": 1024,
-                "width": 1024,
-                "cfgScale": 7.5,
-                "seed": 42
-            }
-        })
-        # Model invocation
-        response = bedrock_client.invoke_model(
-            body=body,
-            modelId="amazon.titan-image-generator-v1",
-            accept="application/json",
-            contentType="application/json"
-        )
-        response_body = json.loads(response.get("body").read())
-        images_b64 = response_body["images"]
-        image_urls = []
-        for img_b64 in images_b64:
-            image_data = base64.b64decode(img_b64)
-            image_key = f"generated-images/{ObjectId()}.png"
-            print("Image Key: ", image_key)
-            s3_client.put_object(
-                Bucket=S3_BUCKET_NAME,
-                Key=image_key,
-                Body=image_data,
-                ContentType="image/png",
-
-            )
-            image_url = f"https://{S3_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{image_key}"
-            image_urls.append(image_url)
-            print("Image URL: ", image_url)
+        image_urls = generate_image_urls(prompt)
         return {"image_urls": image_urls}
     except Exception as e:
         logger.error("Error generating image: %s", e)

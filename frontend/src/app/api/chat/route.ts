@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
     // Initialize the Google Generative AI client
     const genAI = new GoogleGenerativeAI(GEMINI_API_KEY!);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-3.6-flash' });
 
     // Call the model to generate content based on user input
     const result = await model.generateContent(userInput);

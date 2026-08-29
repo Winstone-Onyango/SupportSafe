@@ -60,7 +60,7 @@ export const columns: ColumnDef<any>[] = [
     header: 'Location',
     cell: ({ row }) => <div>{row.getValue('state') || 'Loading...'}</div>,
   },
-  {
+    {
     accessorKey: 'Severity of domestic violence',
     header: ({ column }) => (
       <Button
@@ -107,7 +107,7 @@ export const columns: ColumnDef<any>[] = [
   },
   {
     accessorKey: 'Nature of domestic violence',
-    header: 'Issue',
+    header: 'Nature',
     cell: ({ row }) => cleanText(row.getValue('Nature of domestic violence')),
   },
   {

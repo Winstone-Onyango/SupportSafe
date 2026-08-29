@@ -1,18 +1,20 @@
 import os
 
-import google.generativeai as genai
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
 def generate_text_embedding(text):
+    import google.generativeai as genai
+
     genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
     response = genai.embed_content(
-        model="models/text-embedding-004",
+        model="models/gemini-embedding-001",
         content=text,
         task_type="retrieval_document",
         title="Embedding of culprit info",
+        output_dimensionality=768,
     )
     return response["embedding"]
 
