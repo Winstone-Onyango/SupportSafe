@@ -22,4 +22,6 @@ urlpatterns = [
     path("close-issue/<str:issue_id>", views.close_issue),
     path("upload_embeddings/", views.upload_embeddings),
     path("generate-image", views.generate_image),
+    path("encode-image", views.encode_image),
+    path("hashtag-reports", views.hashtag_reports),
 ]

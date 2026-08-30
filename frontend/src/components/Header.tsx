@@ -1,8 +1,20 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+import { getCurrentUser, type AuthUser } from '@/lib/auth';
 
 function Header() {
+  const [user, setUser] = React.useState<AuthUser | null>(null);
+
+  React.useEffect(() => {
+    const update = () => setUser(getCurrentUser());
+    update();
+    window.addEventListener('supportsafe-auth-changed', update);
+    return () => window.removeEventListener('supportsafe-auth-changed', update);
+  }, []);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Gradient background that blends into the banner */}
@@ -38,16 +50,28 @@ function Header() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center lg:justify-start">
-              <Link href="/create-post">
-                <button className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-lg font-semibold text-white rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 ease-in-out flex items-center justify-center gap-2">
-                  Report Now
-                </button>
-              </Link>
-              <Link href="/sign-in">
-                <button className="w-full sm:w-auto px-8 py-3 text-lg font-semibold text-blue-700 dark:text-blue-300 rounded-xl border-2 border-blue-700 dark:border-blue-300 shadow-md transform hover:scale-105 hover:bg-blue-700 hover:text-white dark:hover:bg-blue-300 dark:hover:text-slate-800 transition-all duration-200 ease-in-out flex items-center justify-center gap-2">
-                  Sign In
-                </button>
-              </Link>
+              {user?.role === 'admin' ? (
+                <Link href="/dashboard">
+                  <button className="w-full sm:w-auto px-8 py-3 text-lg font-semibold text-white rounded-xl border-2 border-blue-700 bg-blue-700 dark:border-blue-300 dark:bg-blue-300 dark:text-slate-800 shadow-md transform hover:scale-105 hover:bg-blue-800 hover:text-white dark:hover:bg-blue-200 transition-all duration-200 ease-in-out flex items-center justify-center gap-2">
+                    Go to Dashboard
+                  </button>
+                </Link>
+              ) : (
+                <>
+                  <Link href="/create-post">
+                    <button className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-lg font-semibold text-white rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 ease-in-out flex items-center justify-center gap-2">
+                      Report Now
+                    </button>
+                  </Link>
+                  {!user && (
+                    <Link href="/sign-in">
+                      <button className="w-full sm:w-auto px-8 py-3 text-lg font-semibold text-blue-700 dark:text-blue-300 rounded-xl border-2 border-blue-700 dark:border-blue-300 shadow-md transform hover:scale-105 hover:bg-blue-700 hover:text-white dark:hover:bg-blue-300 dark:hover:text-slate-800 transition-all duration-200 ease-in-out flex items-center justify-center gap-2">
+                        Sign In
+                      </button>
+                    </Link>
+                  )}
+                </>
+              )}
             </div>
           </div>
 

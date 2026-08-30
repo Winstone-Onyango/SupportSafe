@@ -1,8 +1,14 @@
+'use client';
+
 import React from 'react';
 import { Button } from './ui/button';
 import { ShareIcon } from 'lucide-react';
 import Image from 'next/image';
 import axios from 'axios';
+import toast from 'react-hot-toast';
+
+/** Automatic hashtag attached to every shared report. */
+export const REPORT_HASHTAG = 'IloveSupportSafe';
 
 interface ShareProps {
   imageURL: string;
@@ -12,45 +18,87 @@ interface ShareProps {
 
 function Share({ imageURL, resText, setShared }: ShareProps) {
   const [encodedImage, setEncodedImage] = React.useState<string>('');
+  const [encoding, setEncoding] = React.useState<boolean>(false);
+  const [encoded, setEncoded] = React.useState<boolean>(false);
+
+  /** Hide the victim's message inside the image, then save the report. */
   const handleCommonFunction = async () => {
-    // decode api - img as url (main branch)
-    // decompose - generated text
-    // save to db
-    console.log('resText: ', resText);
-    const encodeImage = await axios.post('/api/decompose', {
-      resImage: imageURL,
-    });
-    setEncodedImage(encodeImage.data.encodedImage);
-    const decomposeReq = await axios.post('/api/decompose', {
-      resText: resText,
-    });
-    // add status(pending) to decomposeReq.data.decomposed
-    const data = {
-      ...decomposeReq.data.decomposed,
-      status: 'pending',
-    };
-    const saveReq = await axios.post('/api/save', data);
-    if (saveReq.status !== 200) {
-      console.log('Failed to save to DB');
+    // 1) CRITICAL: encode the message into the image.
+    try {
+      setEncoding(true);
+      const encodeRes = await axios.post('/api/encode-image', {
+        text: resText,
+        img_url: imageURL,
+      });
+      setEncodedImage(encodeRes.data.encodedImage);
+      setEncoded(true);
+      toast.success(
+        `Your message is hidden in the image. Post it with #${REPORT_HASHTAG} so the team can find it.`
+      );
+    } catch (error: unknown) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const detail =
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (error as any)?.response?.data?.error ||
+        'Failed to hide your message in the image';
+      toast.error(detail);
+      return;
+    } finally {
+      setEncoding(false);
+    }
+
+    // 2) BEST-EFFORT: extract details and save the report locally.
+    //    A failure here must never block the victim from sharing the image.
+    try {
+      const decomposeReq = await axios.post('/api/decompose', {
+        resText: resText,
+      });
+      const data = {
+        ...decomposeReq.data.decomposed,
+        status: 'pending',
+      };
+      const saveReq = await axios.post('/api/save', data);
+      if (saveReq.status !== 200) {
+        console.log('Failed to save to DB');
+      }
+    } catch (error) {
+      console.error('Report detail extraction/saving failed:', error);
+      toast(
+        'Your image is ready to share. (Report details could not be saved, but sharing still works.)',
+        { icon: '⚠️' }
+      );
     }
   };
 
+  const shareCaption = `I need help. The image below carries a hidden message. #${REPORT_HASHTAG}`;
+
   const handleShareTelegram = () => {
+    if (!encodedImage) return;
     const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(
       encodedImage
-    )}`;
+    )}&text=${encodeURIComponent(shareCaption)}`;
     window.open(telegramShareUrl, '_blank');
-
-    handleCommonFunction();
     setShared(true);
   };
 
   const handleShareTwitter = () => {
+    if (!encodedImage) return;
     const twitterShareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(
-      imageURL
-    )}`;
+      encodedImage
+    )}&text=${encodeURIComponent('I need help. The image below carries a hidden message.')}&hashtags=${REPORT_HASHTAG}`;
     window.open(twitterShareUrl, '_blank');
-    handleCommonFunction();
+    setShared(true);
+  };
+
+  const handleShareInstagram = async () => {
+    if (!encodedImage) return;
+    try {
+      await navigator.clipboard.writeText(shareCaption);
+      toast.success('Caption copied. Open Instagram, create a new post and paste the caption.');
+    } catch {
+      toast(`Remember to include #${REPORT_HASHTAG} in your Instagram caption.`);
+    }
+    window.open('https://www.instagram.com/', '_blank');
     setShared(true);
   };
 
@@ -67,35 +115,55 @@ function Share({ imageURL, resText, setShared }: ShareProps) {
         />
       </div>
 
-      <div className="flex items-center gap-4">
-        <Button
-          variant="default"
-          className="flex items-center gap-2"
-          onClick={handleShareTelegram}
-        >
-          <ShareIcon size={24} />
-          Share on Telegram
-        </Button>
-        <Button
-          variant="default"
-          className="flex items-center gap-2 bg-black text-white"
-          onClick={handleShareTwitter}
-        >
-          <ShareIcon size={24} />
-          Share on Twitter
-        </Button>
-        <Button
-          variant="default"
-          // instagram colors
-          className="flex items-center gap-2 bg-gradient-to-r from-[#405DE6] to-[#5851DB] text-white"
-        >
-          <ShareIcon size={24} />
-          Share on Instagram
-        </Button>
-        <Button variant="default" className="flex items-center gap-2">
-          <ShareIcon size={24} />
-          Share on Slack
-        </Button>
+      <p className="text-sm text-gray-600 dark:text-gray-300 max-w-lg text-center">
+        When you press a share button below, your message is first{' '}
+        <span className="font-semibold">hidden inside the image</span> and the
+        post automatically includes{' '}
+        <span className="font-semibold text-blue-700 dark:text-blue-300">
+          #{REPORT_HASHTAG}
+        </span>
+        . Always share the image link, not a screenshot.
+      </p>
+
+      <div className="flex flex-wrap items-center justify-center gap-4">
+        {encoding ? (
+          <Button variant="default" disabled>
+            Hiding your message...
+          </Button>
+        ) : !encoded ? (
+          <Button variant="default" onClick={handleCommonFunction}>
+            <ShareIcon size={24} />
+            Prepare Image for Sharing
+          </Button>
+        ) : (
+          <>
+            <Button
+              variant="default"
+              className="flex items-center gap-2"
+              onClick={handleShareTelegram}
+            >
+              <ShareIcon size={24} />
+              Share on Telegram
+            </Button>
+            <Button
+              variant="default"
+              className="flex items-center gap-2 bg-black text-white"
+              onClick={handleShareTwitter}
+            >
+              <ShareIcon size={24} />
+              Share on Twitter
+            </Button>
+            <Button
+              variant="default"
+              // instagram colors
+              className="flex items-center gap-2 bg-gradient-to-r from-[#405DE6] to-[#5851DB] text-white"
+              onClick={handleShareInstagram}
+            >
+              <ShareIcon size={24} />
+              Share on Instagram
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );

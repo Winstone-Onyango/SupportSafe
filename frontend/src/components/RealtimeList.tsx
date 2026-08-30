@@ -1,311 +1,259 @@
 'use client';
 import * as React from 'react';
 
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
-import {
-  ArrowUpDown,
-  ChevronDown,
-  Loader2,
-  MoreHorizontal,
-} from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
-
+import { Skeleton } from '@/components/ui/skeleton';
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+  AlertCircle,
+  CheckCircle2,
+  EyeOff,
+  RefreshCw,
+  ShieldAlert,
+} from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
-import { cleanText, fetchCityName } from '@/lib/utils';
+import { REPORT_HASHTAG } from './Share';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const columns: ColumnDef<any>[] = [
-  {
-    id: 'sno',
-    header: 'S.No',
-    cell: ({ row }) => row.index + 1,
-    enableSorting: false,
-  },
-  {
-    accessorKey: 'Name',
-    header: 'Name',
-  },
-  {
-    accessorKey: 'state',
-    header: 'Location',
-    cell: ({ row }) => <div>{row.getValue('state') || 'Loading...'}</div>,
-  },
-    {
-    accessorKey: 'Severity of domestic violence',
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        Severity
-        <ArrowUpDown />
-      </Button>
-    ),
-    cell: ({ row }) => {
-      const severity = cleanText(row.getValue('Severity of domestic violence'));
-      const severityColors = {
-        'Very High': 'bg-red-500 text-white',
-        High: 'bg-yellow-500 text-white',
-        Medium: 'bg-blue-500 text-white',
-        Low: 'bg-green-500 text-white',
-      };
-      const severityClass =
-        severityColors[severity as keyof typeof severityColors] ||
-        'bg-gray-300 text-black'; // Default to gray if severity is unknown
+interface HashtagReport {
+  tweet_id: string;
+  author: string;
+  text: string;
+  image_url?: string | null;
+  decoded_from?: string | null;
+  decoded_text: string;
+  has_message: boolean;
+  created_at?: string | null;
+}
 
-      return (
-        <div
-          className={`priority-badge ${severityClass} mx-auto text-center max-w-[80px] text-[10px] border px-1 py-1 rounded-full`}
-        >
-          {severity}
-        </div>
-      );
-    },
-    sortingFn: (rowA, rowB) => {
-      const priorityOrder = { 'Very High': 0, High: 1, Medium: 2, Low: 3 };
-      const severityA = cleanText(
-        rowA.getValue('Severity of domestic violence')
-      );
-      const severityB = cleanText(
-        rowB.getValue('Severity of domestic violence')
-      );
-      return (
-        priorityOrder[severityA as keyof typeof priorityOrder] -
-        priorityOrder[severityB as keyof typeof priorityOrder]
-      );
-    },
-  },
-  {
-    accessorKey: 'Nature of domestic violence',
-    header: 'Nature',
-    cell: ({ row }) => cleanText(row.getValue('Nature of domestic violence')),
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }) => {
-      const status = row.getValue('status');
-      return (
-        <div>
-          {typeof status === 'string'
-            ? status.charAt(0).toUpperCase() + status.slice(1)
-            : ''}
-        </div>
-      );
-    },
-  },
-  {
-    id: 'actions',
-    enableHiding: false,
-    cell: ({ row }) => {
-      const post = row.original;
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(post._id)}
-            >
-              Copy ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link href={`/post/${post._id}`}>View Details</Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
-];
+interface LocalPost {
+  _id?: string;
+  Name?: string;
+  'Severity of domestic violence'?: string;
+  'Nature of domestic violence'?: string;
+  status?: string;
+  current_situation?: string;
+}
 
-export default function RealtimeList() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [data, setData] = React.useState<any[]>([]);
+function severityBadge(severity?: string) {
+  const s = (severity || '').toLowerCase();
+  if (s.includes('very high')) return 'bg-red-500 text-white';
+  if (s.includes('high')) return 'bg-yellow-500 text-white';
+  if (s.includes('medium')) return 'bg-blue-500 text-white';
+  if (s.includes('low')) return 'bg-green-500 text-white';
+  return 'bg-gray-300 text-black';
+}
+
+function RealtimeList() {
+  const [reports, setReports] = React.useState<HashtagReport[] | null>(null);
+  const [localPosts, setLocalPosts] = React.useState<LocalPost[]>([]);
   const [loading, setLoading] = React.useState(true);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+  const [twitterConfigured, setTwitterConfigured] = React.useState(true);
+  const [error, setError] = React.useState('');
 
-  React.useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch('/api/getPosts');
-        const result = await response.json();
-        console.log(result);
-        const enrichedData = await Promise.all(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          result.map(async (post: any) => {
-            const clenLoc = cleanText(post.Location);
-            const [latitude, longitude] = clenLoc.split(',').map(Number);
-            console.log(latitude, longitude);
-            const state = await fetchCityName(latitude, longitude);
-
-            return {
-              ...post,
-              state: state || 'Unknown Location', // Fallback if no city is found
-            };
-          })
-        );
-
-        setData(enrichedData);
-        // setData(result);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false);
+  const load = React.useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/hashtag-reports');
+      if (res.ok) {
+        const data = await res.json();
+        setReports(data.reports ?? []);
+        setTwitterConfigured(true);
+      } else {
+        const body = await res.json().catch(() => ({}));
+        if (res.status === 503 || body.configured === false) {
+          setTwitterConfigured(false);
+          setReports([]);
+        } else {
+          setTwitterConfigured(true);
+          setError(body.detail || 'Failed to load hashtag reports');
+          setReports([]);
+        }
       }
-    };
-
-    fetchData();
+      // Always load locally saved reports as a backup view.
+      try {
+        const postsRes = await fetch('/api/getPosts');
+        if (postsRes.ok) {
+          setLocalPosts(await postsRes.json());
+        }
+      } catch {
+        // ignore - local posts are optional
+      }
+    } catch {
+      setError('Could not reach the report monitoring service');
+      setReports([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const table = useReactTable({
-    data,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
-  });
+  React.useEffect(() => {
+    load();
+  }, [load]);
+
+  const decodedCount = (reports ?? []).filter((r) => r.has_message).length;
 
   if (loading) {
     return (
-      <div>
-        <Loader2 className="animate-spin" />
+      <div className="space-y-4 mt-4">
+        <h2 className="text-xl font-semibold">
+          Live Reports — #{REPORT_HASHTAG}
+        </h2>
+        {[...Array(3)].map((_, i) => (
+          <Skeleton key={i} className="h-32 w-full bg-gray-300" />
+        ))}
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-5xl">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter by name..."
-          value={(table.getColumn('Name')?.getFilterValue() as string) ?? ''}
-          onChange={(event) =>
-            table.getColumn('Name')?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+    <div className="space-y-4 mt-4 w-full">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">
+          Live Reports —{' '}
+          <span className="text-blue-700 dark:text-blue-300">
+            #{REPORT_HASHTAG}
+          </span>
+        </h2>
+        <Button variant="outline" onClick={load} className="flex items-center gap-2">
+          <RefreshCw size={16} />
+          Refresh
+        </Button>
       </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="text-center">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
+
+      <p className="text-sm text-gray-600 dark:text-gray-300">
+        {reports?.length ?? 0} post(s) found with the hashtag ·{' '}
+        <span className="font-semibold text-green-700 dark:text-green-300">
+          {decodedCount} decoded message(s)
+        </span>
+      </p>
+
+      {!twitterConfigured && (
+        <div className="rounded-lg border border-yellow-300 bg-yellow-50 dark:border-yellow-700 dark:bg-yellow-900/30 px-4 py-3 text-sm text-yellow-800 dark:text-yellow-200 flex items-start gap-2">
+          <AlertCircle className="mt-0.5 shrink-0" size={18} />
+          <span>
+            Twitter API credentials are not configured, so hashtag monitoring is
+            unavailable. Add <code>TWITTER_BEARER_TOKEN</code> (plus the posting
+            keys) to your <code>.env</code> file to enable it. Locally saved
+            reports are shown below in the meantime.
+          </span>
+        </div>
+      )}
+
+      {error && (
+        <div className="rounded-lg border border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-900/30 px-4 py-3 text-sm text-red-700 dark:text-red-300 flex items-start gap-2">
+          <AlertCircle className="mt-0.5 shrink-0" size={18} />
+          <span>{error}</span>
+        </div>
+      )}
+
+      {/* Decoded hashtag reports */}
+      <div className="space-y-4">
+        {(reports ?? []).map((report) => (
+          <div
+            key={report.tweet_id}
+            className="rounded-xl border shadow-sm bg-white dark:bg-slate-800 dark:border-slate-700 p-4 flex flex-col sm:flex-row gap-4"
+          >
+            <div className="sm:w-40 sm:h-40 w-full h-40 relative rounded-lg overflow-hidden bg-gray-100 dark:bg-slate-700 shrink-0">
+              {report.image_url ? (
+                <Image
+                  src={report.image_url}
+                  alt={`Report image from @${report.author}`}
+                  fill
+                  unoptimized
+                  className="object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <EyeOff size={24} />
+                </div>
+              )}
+            </div>
+            <div className="flex-1 min-w-0 space-y-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-semibold">@{report.author}</span>
+                {report.created_at && (
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {new Date(report.created_at).toLocaleString()}
+                  </span>
+                )}
+                <Link
+                  href={`https://twitter.com/${report.author}/status/${report.tweet_id}`}
+                  target="_blank"
+                  className="text-xs text-blue-600 dark:text-blue-400 underline underline-offset-2"
+                >
+                  View post
+                </Link>
+              </div>
+              <p className="text-sm text-gray-600 dark:text-gray-300 break-words">
+                {report.text}
+              </p>
+              {report.has_message ? (
+                <div className="rounded-lg border border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-900/30 px-3 py-2 text-sm text-green-800 dark:text-green-200">
+                  <div className="flex items-center gap-1.5 font-semibold mb-1">
+                    <CheckCircle2 size={16} />
+                    Hidden message decoded
+                  </div>
+                  <p className="whitespace-pre-line break-words">
+                    {report.decoded_text}
+                  </p>
+                </div>
+              ) : (
+                <div className="rounded-lg border border-gray-200 bg-gray-50 dark:border-slate-600 dark:bg-slate-700/50 px-3 py-2 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                  <ShieldAlert size={14} />
+                  No hidden message found in this image (it may have been
+                  re-encoded by the platform).
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+        {twitterConfigured && (reports ?? []).length === 0 && (
+          <div className="rounded-lg border border-gray-200 dark:border-slate-600 px-4 py-6 text-center text-gray-500 dark:text-gray-400 text-sm">
+            No posts with #{REPORT_HASHTAG} found yet. Reports will appear here
+            automatically once victims share their encoded images with the
+            hashtag.
+          </div>
+        )}
+      </div>
+
+      {/* Locally saved reports (fallback view) */}
+      {localPosts.length > 0 && (
+        <div className="space-y-2 pt-4">
+          <h3 className="font-semibold text-gray-700 dark:text-gray-200">
+            Locally saved reports ({localPosts.length})
+          </h3>
+          <div className="space-y-2">
+            {localPosts.map((post, index) => (
+              <div
+                key={post._id || index}
+                className="rounded-lg border bg-white dark:bg-slate-800 dark:border-slate-700 p-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4"
+              >
+                <span className="font-medium w-40 truncate">
+                  {post.Name || 'Anonymous'}
+                </span>
+                <span
+                  className={`text-[10px] px-2 py-1 rounded-full w-fit ${severityBadge(
+                    post['Severity of domestic violence']
+                  )}`}
+                >
+                  {post['Severity of domestic violence'] || 'Unknown'}
+                </span>
+                <span className="text-sm text-gray-600 dark:text-gray-300 flex-1 truncate">
+                  {post['Nature of domestic violence'] ||
+                    post.current_situation ||
+                    '—'}
+                </span>
+                <span className="text-xs uppercase text-gray-400">
+                  {post.status || 'pending'}
+                </span>
+              </div>
             ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="text-center">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length}>No results.</TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+export default RealtimeList;

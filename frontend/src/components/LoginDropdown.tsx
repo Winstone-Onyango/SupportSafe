@@ -43,9 +43,11 @@ export function LoginDropdown() {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => router.push('/dashboard')}>
-          Dashboard
-        </DropdownMenuItem>
+        {user.role === 'admin' && (
+          <DropdownMenuItem onClick={() => router.push('/dashboard')}>
+            Dashboard
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem
           onClick={() => {
             logout();

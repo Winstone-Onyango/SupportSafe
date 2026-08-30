@@ -18,8 +18,6 @@ import axios from 'axios';
 import { useState } from 'react';
 import Image from 'next/image';
 import { Skeleton } from './ui/skeleton'; // Assuming Skeleton component is from your UI library
-import { SparklesIcon } from 'lucide-react';
-import Link from 'next/link';
 
 // Zod validation schema for form
 const FormSchema = z.object({
@@ -47,11 +45,9 @@ export default function ImageGen({
   });
 
   const [imageOptions, setImageOptions] = useState<string[] | null>(null); // To hold the array of image URLs
-  const [selectedImage, setSelectedImage] = useState<string | null>(null); // To store the selected image
   const [isLoading, setIsLoading] = useState<boolean>(false); // Loading state for images
   const [genError, setGenError] = useState<string>(''); // Friendly error message
   const [selectedText, setSelectedText] = useState<string>('');
-  const [selectedModel, setSelectedModel] = useState<string>(''); // Default model
 
   const promptSuggestions = [
     'Good Morning',
@@ -82,13 +78,11 @@ export default function ImageGen({
   };
 
   const handleImageSelect = (imageUrl: string) => {
-    setSelectedImage(imageUrl); // Set the selected image as final
     setResImage(imageUrl); // Update the parent component with the final image URL
   };
 
     const handleTextOptionClick = (selected: string) => {
     setSelectedText(selected);
-    setSelectedModel(selected === textGemma ? 'gemma' : 'gemini');
     form.setValue('generatedText', selected);
   };
 
@@ -116,15 +110,6 @@ export default function ImageGen({
                         <p className="text-sm text-slate-700 dark:text-slate-200 line-clamp-4 whitespace-pre-wrap">
                           {textOption}
                         </p>
-                        <span
-                          className={`${
-                            textOption === textGemma
-                              ? 'bg-gradient-to-tr from-orange-500 to-orange-300 text-white'
-                              : 'bg-gradient-to-tr from-blue-500 to-blue-400 text-white'
-                          } text-xs rounded-full py-0.5 px-2 mt-2 inline-block`}
-                        >
-                          {textOption === textGemma ? 'Gemma' : 'Gemini'}
-                        </span>
                       </div>
                     ))}
                   </div>
@@ -133,19 +118,6 @@ export default function ImageGen({
                     <p className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words max-h-56 overflow-y-auto pr-2">
                       {selectedText}
                     </p>
-                    <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 mt-2 pt-2 border-t border-slate-200 dark:border-slate-600 justify-end">
-                      <SparklesIcon size={12} />
-                      <span>
-                        Generated with{' '}
-                        <Link
-                          href="https://gemini.google.com/"
-                          target="_blank"
-                          className="underline underline-offset-2 text-blue-600 dark:text-blue-400"
-                        >
-                          {selectedModel === 'gemma' ? 'Gemma' : 'Gemini'}
-                        </Link>
-                      </span>
-                    </div>
                   </div>
                 )}
               </FormControl>
@@ -187,12 +159,6 @@ export default function ImageGen({
         {genError && (
           <div className="rounded-lg border border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-900/30 px-4 py-3 text-sm text-red-700 dark:text-red-300">
             {genError}
-            {genError.includes('RESOURCE_EXHAUSTED') || genError.includes('quota') ? (
-              <p className="mt-1 text-xs opacity-80">
-                The free-tier Gemini image quota is exhausted. Try again later or enable billing on
-                your Google AI Studio key.
-              </p>
-            ) : null}
           </div>
         )}
 
@@ -205,8 +171,8 @@ export default function ImageGen({
         // Skeleton loader shown while the images are being generated
         <div className="mt-6 space-y-4">
           <h2 className="text-xl font-semibold">Generating Images...</h2>
-          <div className="grid grid-cols-3 gap-4">
-            {[...Array(3)].map((_, index) => (
+          <div className="grid grid-cols-2 gap-4">
+            {[...Array(2)].map((_, index) => (
               <Skeleton key={index} className="h-[192px] w-full bg-gray-300" />
             ))}
           </div>
@@ -214,7 +180,7 @@ export default function ImageGen({
       ) : imageOptions && imageOptions.length > 0 ? (
         <div className="mt-6 space-y-4 mb-6">
           <h2 className="text-xl font-semibold">Select an Image</h2>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             {imageOptions.map((imageUrl, index) => (
               <div
                 key={index}

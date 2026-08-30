@@ -1,0 +1,25 @@
+[30/Aug/2026 22:54:55] "POST /encode-image HTTP/1.1" 200 136
+C:\Users\Winstone\Desktop\Winstone\Samsung AI\Project Capstone\SupportSafe\backend_django\haven\utils\text_llm.py:15: FutureWarning: 
+
+All support for the `google.generativeai` package has ended. It will no longer be receiving 
+updates or bug fixes. Please switch to the `google.genai` package as soon as possible.
+See README for more details:
+
+https://github.com/google-gemini/deprecated-generative-ai-python/blob/main/README.md
+
+  import google.generativeai as genai
+[30/Aug/2026 22:55:12] "POST /text-decomposition HTTP/1.1" 200 496
+[30/Aug/2026 22:55:25] "POST /text-decomposition HTTP/1.1" 200 474
+[30/Aug/2026 22:55:30] "POST /save-extracted-data HTTP/1.1" 200 37
+[30/Aug/2026 23:04:37] "POST /text-generation HTTP/1.1" 200 2905
+[30/Aug/2026 23:05:47] "POST /generate-image HTTP/1.1" 200 246
+[30/Aug/2026 23:06:02] "POST /encode-image HTTP/1.1" 200 136
+[30/Aug/2026 23:06:06] "POST /text-decomposition HTTP/1.1" 200 22
+[30/Aug/2026 23:06:11] "POST /save-extracted-data HTTP/1.1" 200 37
+[30/Aug/2026 23:06:58] "POST /auth/login HTTP/1.1" 200 229
+Service Unavailable: /hashtag-reports
+[30/Aug/2026 23:07:05] "GET /hashtag-reports?hashtag=IloveSupportSafe&max_results=25 HTTP/1.1" 503 154
+Service Unavailable: /hashtag-reports
+[30/Aug/2026 23:07:05] "GET /hashtag-reports?hashtag=IloveSupportSafe&max_results=25 HTTP/1.1" 503 154
+[30/Aug/2026 23:07:08] "GET /get-admin-posts HTTP/1.1" 200 1105
+[30/Aug/2026 23:07:09] "GET /get-admin-posts HTTP/1.1" 200 1105

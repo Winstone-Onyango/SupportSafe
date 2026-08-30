@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
 from haven.db import get_database, upload_embeddings_to_mongo
-from haven.images import generate_image_urls
+from haven.images import generate_image_urls, upload_image_bytes_to_supabase
 from haven.utils.common import (load_image_from_url_or_file,
                                 read_files_from_directory,
                                 serialize_object_id)
@@ -20,7 +20,9 @@ from haven.utils.steganography import (decode_text_from_image,
 from haven.utils.text_llm import (create_poem, decompose_user_text,
                                   expand_user_text_using_gemma,
                                   expand_user_text_using_gemini)
-from haven.utils.twitter import TwitterAPIError, send_message_to_twitter
+from haven.utils.twitter import (DEFAULT_HASHTAG, TwitterAPIError,
+                                 search_posts_by_hashtag,
+                                 send_message_to_twitter)
 
 DOCS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs")
 
@@ -237,3 +239,99 @@ def generate_image(request):
         return JsonResponse({"image_urls": image_urls})
     except Exception as e:
         return _error(f"Error generating image: {e}")
+
+
+@csrf_exempt
+@require_POST
+def encode_image(request):
+    """Hide a message inside an image and store it in Supabase Storage.
+
+    Accepts JSON {text, img_url}. img_url is optional; when omitted a plain
+    placeholder image is used. Returns {"encoded_image_url": ...} so the
+    victim can share the stego image to social media.
+    """
+    try:
+        data = _body(request)
+        text = data.get("text") or ""
+        if not text:
+            return _error("A message to hide is required", status=400)
+        image = load_image_from_url_or_file(img_url=data.get("img_url"))
+        encoded_image = encode_text_in_image(image, text)
+        from io import BytesIO
+
+        buffer = BytesIO()
+        encoded_image.save(buffer, format="PNG")
+        encoded_url = upload_image_bytes_to_supabase(buffer.getvalue())
+        return JsonResponse({"encoded_image_url": encoded_url})
+    except Exception as e:
+        return _error(f"Error encoding text in image: {e}")
+
+
+def _decode_image_urls(urls):
+    """Try to decode a hidden message from each URL; return the first hit."""
+    from io import BytesIO
+
+    import requests as requests_lib
+    from PIL import Image
+
+    for url in urls:
+        try:
+            resp = requests_lib.get(url, timeout=60)
+            if resp.status_code != 200:
+                continue
+            image = Image.open(BytesIO(resp.content))
+            decoded = decode_text_from_image(image)
+            if decoded:
+                return url, decoded
+        except Exception as e:
+            print(f"Could not decode image at {url}: {e}")
+    return None, ""
+
+
+@require_GET
+def hashtag_reports(request):
+    """Monitor social media for #IloveSupportSafe posts and decode them.
+
+    Searches recent tweets containing the hashtag, then decodes the hidden
+    message inside every shared image using LSB steganography.
+    """
+    try:
+        hashtag = request.GET.get("hashtag", DEFAULT_HASHTAG)
+        max_results = int(request.GET.get("max_results", 25))
+        posts = search_posts_by_hashtag(hashtag, max_results)
+
+        reports = []
+        for post in posts:
+            candidate_urls = []
+            if post.get("image_url"):
+                candidate_urls.append(post["image_url"])
+            # Original image links shared in the tweet text (e.g. Supabase
+            # storage links) are more likely to still carry the LSB payload
+            # because social platforms re-encode uploaded media.
+            for url in post.get("extra_urls", []):
+                if "supabase" in url or url.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
+                    candidate_urls.append(url)
+
+            decoded_from, decoded_text = _decode_image_urls(candidate_urls)
+            reports.append(
+                {
+                    "tweet_id": post["tweet_id"],
+                    "author": post["author"],
+                    "text": post["text"],
+                    "image_url": post.get("image_url"),
+                    "decoded_from": decoded_from or None,
+                    "decoded_text": decoded_text,
+                    "has_message": bool(decoded_text),
+                    "created_at": post.get("created_at"),
+                }
+            )
+        return JsonResponse(
+            {"hashtag": hashtag, "count": len(reports), "reports": reports}
+        )
+    except TwitterAPIError as e:
+        return JsonResponse(
+            {"detail": f"Error searching hashtag: {e}", "configured": False},
+            status=503,
+        )
+    except Exception as e:
+        return _error(f"Error retrieving hashtag reports: {e}")

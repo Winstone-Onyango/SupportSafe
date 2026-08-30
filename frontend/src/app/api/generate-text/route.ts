@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { NextResponse } from 'next/server';
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
+
 interface GenerateTextRequestData {
   name: string;
   phone: string;
@@ -29,8 +31,9 @@ export async function POST(req: Request) {
 
     console.log('received data:', updatedData);
     const res = await axios.post(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/text-generation`,
-      updatedData
+      `${BACKEND_URL}/text-generation`,
+      updatedData,
+      { timeout: 120000 }
     );
     console.log('Text next api:', res.data.gemini_response);
     // const res = {
@@ -47,9 +50,9 @@ export async function POST(req: Request) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('Image generation failed:', error);
+    console.error('Text generation failed:', error);
     return NextResponse.json(
-      { error: 'Failed to generate image' },
+      { error: 'Failed to generate the message text' },
       { status: 500 }
     );
   }

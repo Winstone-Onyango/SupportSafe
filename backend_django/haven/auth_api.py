@@ -99,6 +99,12 @@ def login(request):
         user = db["users"].find_one({"$or": [{"username": username}, {"email": username}]})
         if user is None or not check_password(password, user.get("password", "")):
             return JsonResponse({"detail": "Invalid username or password"}, status=401)
+        # Only the single pre-configured administrator may sign in.
+        if user.get("role") != "admin":
+            return JsonResponse(
+                {"detail": "Only the administrator can sign in to SupportSafe"},
+                status=403,
+            )
 
         return JsonResponse({"token": _issue_token(user["_id"]), "user": _public_user(user)})
     except Exception as e:
