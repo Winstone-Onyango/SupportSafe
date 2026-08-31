@@ -45,15 +45,19 @@ function NavContent({ pathname }: { pathname: string }) {
             Dashboard
           </Link>
         )}
-        <Link href="/lawbot" className={linkClass('/lawbot')}>
-          Law Bot
-        </Link>
-        <Link
-          href="https://ai-avatar-frontend-coral.vercel.app/"
-          className={linkClass('/therapybot')}
-        >
-          Therapy Bot
-        </Link>
+        {(user?.role !== 'admin' || !user) && (
+          <>
+            <Link href="/lawbot" className={linkClass('/lawbot')}>
+              Law Bot
+            </Link>
+            <Link
+              href="https://ai-avatar-frontend-coral.vercel.app/"
+              className={linkClass('/therapybot')}
+            >
+              Therapy Bot
+            </Link>
+          </>
+        )}
       </div>
       <div className="flex items-center gap-2">
         <ModeToggle />

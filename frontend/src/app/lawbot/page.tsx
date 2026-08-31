@@ -6,11 +6,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '../../components/ui/input';
 import { ArrowUp, Scale, Triangle, Check, Fingerprint } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import Image from 'next/image';
-import modelImage from '../../assets/modelLogo.png';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import RequireNotAdmin from '@/components/RequireNotAdmin';
 
 const ChatSchema = z.object({
   message: z.string().min(1, 'Message cannot be empty'),
@@ -31,7 +30,7 @@ const promptSuggestions = [
   },
 ];
 
-function Page() {
+function LawBotContent() {
   const [messages, setMessages] = React.useState<
     {
       text: string;
@@ -144,13 +143,12 @@ function Page() {
                 }`}
               >
                 {!message.isUser && (
-                  <Image
-                    src={modelImage}
-                    alt="Bot Avatar"
-                    width={45}
-                    height={45}
-                    className="rounded-full"
-                  />
+                  <div
+                    aria-label="SupportSafe Bot Avatar"
+                    className="shrink-0 h-11 w-11 rounded-full bg-gradient-to-br from-blue-700 to-indigo-700 text-white flex items-center justify-center font-bold text-lg shadow-sm border border-blue-800"
+                  >
+                    S
+                  </div>
                 )}
                 <div
                   className={`py-2 px-3 rounded-md max-w-[70%] ${
@@ -210,6 +208,14 @@ function Page() {
         </form>
       )}
     </div>
+  );
+}
+
+function Page() {
+  return (
+    <RequireNotAdmin>
+      <LawBotContent />
+    </RequireNotAdmin>
   );
 }
 

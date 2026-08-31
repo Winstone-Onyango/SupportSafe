@@ -70,7 +70,14 @@ function Share({ imageURL, resText, setShared }: ShareProps) {
     }
   };
 
-  const shareCaption = `I need help. The image below carries a hidden message. #${REPORT_HASHTAG}`;
+  /**
+   * DISCREET CAPTION:
+   * The victim's real message is hidden inside the image (steganography).
+   * The public post caption must NOT reveal that anything is hidden —
+   * otherwise the cover is blown. The #IloveSupportSafe hashtag is the
+   * only signal the monitoring team needs to locate and decode the post.
+   */
+  const shareCaption = `Something worth sharing today. #${REPORT_HASHTAG}`;
 
   const handleShareTelegram = () => {
     if (!encodedImage) return;
@@ -85,7 +92,7 @@ function Share({ imageURL, resText, setShared }: ShareProps) {
     if (!encodedImage) return;
     const twitterShareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(
       encodedImage
-    )}&text=${encodeURIComponent('I need help. The image below carries a hidden message.')}&hashtags=${REPORT_HASHTAG}`;
+    )}&text=${encodeURIComponent(shareCaption)}&hashtags=${REPORT_HASHTAG}`;
     window.open(twitterShareUrl, '_blank');
     setShared(true);
   };
