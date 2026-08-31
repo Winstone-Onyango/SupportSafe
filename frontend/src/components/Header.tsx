@@ -36,17 +36,20 @@ function Header() {
               </span>
             </h1>
 
-            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-2xl lg:max-w-xl">
-              SupportSafe is a discreet AI companion for anyone facing abuse —
-              regardless of gender. Get help, confidential guidance, private mental
-              health support, and trusted legal advice, all without exposing your
-              situation.
+            <p className="font-bold text-2xl md:text-3xl lg:text-4xl text-gray-800 dark:text-gray-100 leading-snug max-w-2xl lg:max-w-2xl mx-auto lg:mx-0">
+              You deserve to feel safe. You deserve to be heard.
             </p>
 
-            <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed max-w-2xl lg:max-w-xl">
-              Whether you need a safe way to ask for help, emotional support, or
-              legal clarity, SupportSafe guides you gently and securely. Your safety
-              is our priority.
+            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-2xl lg:max-w-2xl mx-auto lg:mx-0">
+              If you’re facing abuse, you don’t have to face it alone. SupportSafe
+              gives you a discreet way to seek help, understand your rights, and
+              find a safe space to talk and receive emotional support — without
+              judgment and without having to explain everything at once.
+            </p>
+
+            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-2xl lg:max-w-2xl mx-auto lg:mx-0">
+              Your story matters. Your safety matters. And taking the first step
+              can start here.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center lg:justify-start">
