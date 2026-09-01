@@ -79,12 +79,40 @@ function Share({ imageURL, resText, setShared }: ShareProps) {
    */
   const shareCaption = `Something worth sharing today. #${REPORT_HASHTAG}`;
 
-  const handleShareTelegram = () => {
+  /**
+   * TELEGRAM CHANNEL FLOW:
+   * The encoded image + caption are posted directly to the SupportSafe
+   * Telegram channel through the backend bot, so the monitoring team always
+   * sees it. If the backend bot is not configured yet, we fall back to the
+   * manual share intent so the victim is never blocked.
+   */
+  const handleShareTelegram = async () => {
     if (!encodedImage) return;
+    try {
+      const res = await axios.post('/api/send-to-telegram', {
+        image_url: encodedImage,
+        caption: shareCaption,
+      });
+      if (res.status === 200) {
+        toast.success('Your report was posted to the SupportSafe Telegram channel.');
+        setShared(true);
+        return;
+      }
+    } catch (error: unknown) {
+      // 503 = bot not configured yet -> fall back to manual sharing below.
+      // Other errors also fall back so the victim is never blocked.
+      console.error(
+        'Telegram channel post failed, falling back to manual share:',
+        error
+      );
+    }
     const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(
       encodedImage
     )}&text=${encodeURIComponent(shareCaption)}`;
     window.open(telegramShareUrl, '_blank');
+    toast(
+      `Shared via Telegram. Remember to post it in the SupportSafe channel with #${REPORT_HASHTAG}.`
+    );
     setShared(true);
   };
 
@@ -94,18 +122,6 @@ function Share({ imageURL, resText, setShared }: ShareProps) {
       encodedImage
     )}&text=${encodeURIComponent(shareCaption)}&hashtags=${REPORT_HASHTAG}`;
     window.open(twitterShareUrl, '_blank');
-    setShared(true);
-  };
-
-  const handleShareInstagram = async () => {
-    if (!encodedImage) return;
-    try {
-      await navigator.clipboard.writeText(shareCaption);
-      toast.success('Caption copied. Open Instagram, create a new post and paste the caption.');
-    } catch {
-      toast(`Remember to include #${REPORT_HASHTAG} in your Instagram caption.`);
-    }
-    window.open('https://www.instagram.com/', '_blank');
     setShared(true);
   };
 
@@ -159,15 +175,6 @@ function Share({ imageURL, resText, setShared }: ShareProps) {
             >
               <ShareIcon size={24} />
               Share on Twitter
-            </Button>
-            <Button
-              variant="default"
-              // instagram colors
-              className="flex items-center gap-2 bg-gradient-to-r from-[#405DE6] to-[#5851DB] text-white"
-              onClick={handleShareInstagram}
-            >
-              <ShareIcon size={24} />
-              Share on Instagram
             </Button>
           </>
         )}

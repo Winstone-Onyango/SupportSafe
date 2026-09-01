@@ -1,6 +1,7 @@
 'use client';
 
 import RealtimeList from '@/components/RealtimeList';
+import TelegramReports from '@/components/TelegramReports';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import React from 'react';
@@ -59,6 +60,8 @@ function Page() {
     <div className=" flex flex-col justify-center mx-auto max-w-5xl w-full p-4">
       <LiveTitleNoSSR />
       <RealtimeList />
+      {/* Dedicated Telegram channel monitoring section */}
+      <TelegramReports />
     </div>
   );
 }

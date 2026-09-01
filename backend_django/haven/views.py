@@ -267,6 +267,267 @@ def encode_image(request):
         return _error(f"Error encoding text in image: {e}")
 
 
+@csrf_exempt
+@require_POST
+def send_to_telegram(request):
+    """Post the encoded image + caption to the SupportSafe Telegram channel.
+
+    Uses the TELEGRAM_BOT_TOKEN bot, which must be an Administrator of the
+    TELEGRAM_CHANNEL_ID channel with "Post messages" permission. This is how
+    victim reports reach a place the monitoring team actually watches.
+    """
+    import requests as requests_lib
+
+    data = _body(request)
+    image_url = data.get("image_url")
+    caption = (data.get("caption") or "").strip()
+    if not image_url:
+        return _error("image_url is required", status=400)
+
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    channel = os.getenv("TELEGRAM_CHANNEL_ID")
+    if not token or not channel:
+        return JsonResponse(
+            {
+                "detail": "Telegram is not configured. Create a bot with @BotFather, add it as an administrator of your channel, then set TELEGRAM_BOT_TOKEN and TELEGRAM_CHANNEL_ID in the .env file.",
+                "configured": False,
+            },
+            status=503,
+        )
+
+    try:
+        response = requests_lib.post(
+            f"https://api.telegram.org/bot{token}/sendPhoto",
+            json={
+                "chat_id": channel,
+                "photo": image_url,
+                "caption": caption[:1024],  # Telegram caption limit
+            },
+            timeout=60,
+        )
+        payload = response.json()
+        if not payload.get("ok"):
+            return _error(
+                f"Telegram API error: {payload.get('description', 'unknown error')}",
+                status=502,
+            )
+        result = payload["result"]
+        # Index the post we just made so it appears in the channel feed
+        # (bots never receive their own messages via getUpdates).
+        try:
+            _store_channel_post(
+                _db()["telegram_reports"], requests_lib, token, result
+            )
+        except Exception as store_error:
+            print(f"Could not index the Telegram channel post: {store_error}")
+        return JsonResponse(
+            {
+                "status": "posted",
+                "message_id": result["message_id"],
+            }
+        )
+    except Exception as e:
+        return _error(f"Error sending to Telegram: {e}")
+
+
+# ---------------------------------------------------------------------------
+# Telegram channel monitoring
+# ---------------------------------------------------------------------------
+TELEGRAM_OFFSET = {"value": 0}
+
+
+def _store_channel_post(collection, requests_lib, token, post):
+    """Decode and index one channel post. Safe to call repeatedly (upsert)."""
+    import re
+
+    message_id = post["message_id"]
+    chat = post.get("chat", {})
+    if collection.find_one({"chat_id": chat.get("id"), "message_id": message_id}):
+        return  # already indexed
+
+    text = post.get("text") or post.get("caption") or ""
+    author = (
+        (post.get("sender_chat") or {}).get("title")
+        or chat.get("title")
+        or chat.get("username")
+        or "unknown"
+    )
+
+    # Image attached to the post: photo (compressed) or document (original
+    # bytes, which preserves the steganography payload).
+    image_file_id = None
+    mime_type = None
+    if post.get("photo"):
+        image_file_id = post["photo"][-1]["file_id"]  # largest size
+        mime_type = "image/jpeg"
+    document = post.get("document")
+    if document and (document.get("mime_type") or "").startswith("image/"):
+        image_file_id = document["file_id"]
+        mime_type = document.get("mime_type")
+
+    # Candidate URLs to decode: links shared in the text (e.g. the Supabase
+    # link of the encoded image) plus the attached image itself.
+    candidate_urls = [
+        url.rstrip(").,")
+        for url in re.findall(r"https?://\S+", text)
+    ]
+
+    file_path = None
+    if image_file_id:
+        file_resp = requests_lib.get(
+            f"https://api.telegram.org/bot{token}/getFile",
+            params={"file_id": image_file_id},
+            timeout=30,
+        )
+        file_payload = file_resp.json()
+        if file_payload.get("ok"):
+            file_path = file_payload["result"]["file_path"]
+            candidate_urls.append(
+                f"https://api.telegram.org/file/bot{token}/{file_path}"
+            )
+
+    decoded_from, decoded_text = _decode_image_urls(candidate_urls)
+    if decoded_from and "api.telegram.org" in decoded_from:
+        decoded_from = "channel image (Telegram)"  # never leak the bot token
+
+    report = {
+        "chat_id": chat.get("id"),
+        "chat_title": chat.get("title"),
+        "chat_username": chat.get("username"),
+        "message_id": message_id,
+        "author": author,
+        "text": text,
+        "has_image": bool(image_file_id),
+        "file_path": file_path,
+        "mime_type": mime_type,
+        "decoded_from": decoded_from or None,
+        "decoded_text": decoded_text,
+        "has_message": bool(decoded_text),
+        "telegram_date": post.get("date"),
+    }
+    collection.update_one(
+        {"chat_id": chat.get("id"), "message_id": message_id},
+        {"$set": report},
+        upsert=True,
+    )
+
+
+def _poll_telegram_channel(requests_lib, token):
+    """Pull new channel posts via getUpdates and index them."""
+    response = requests_lib.get(
+        f"https://api.telegram.org/bot{token}/getUpdates",
+        params={
+            "offset": TELEGRAM_OFFSET["value"],
+            "timeout": 0,
+            "limit": 100,
+            "allowed_updates": json.dumps(["channel_post"]),
+        },
+        timeout=30,
+    )
+    payload = response.json()
+    if not payload.get("ok"):
+        raise Exception(
+            f"Telegram getUpdates failed: {payload.get('description', 'unknown error')}"
+        )
+
+    max_update_id = TELEGRAM_OFFSET["value"] - 1
+    for update in payload.get("result", []):
+        max_update_id = max(max_update_id, update["update_id"])
+        post = update.get("channel_post")
+        if post:
+            _store_channel_post(
+                _db()["telegram_reports"], requests_lib, token, post
+            )
+    TELEGRAM_OFFSET["value"] = max_update_id + 1
+
+
+def _serialize_telegram_report(report):
+    return {
+        "message_id": report.get("message_id"),
+        "chat_title": report.get("chat_title"),
+        "chat_username": report.get("chat_username"),
+        "author": report.get("author"),
+        "text": report.get("text", ""),
+        "has_image": report.get("has_image", False),
+        "decoded_from": report.get("decoded_from"),
+        "decoded_text": report.get("decoded_text", ""),
+        "has_message": report.get("has_message", False),
+        "telegram_date": report.get("telegram_date"),
+    }
+
+
+@require_GET
+def telegram_reports(request):
+    """Feed of every post in the SupportSafe Telegram channel (dashboard).
+
+    Polls the bot for new channel posts, decodes any steganography payloads,
+    stores them in MongoDB, and returns the full stored feed (newest first).
+    """
+    import requests as requests_lib
+
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    if not token:
+        return JsonResponse(
+            {
+                "detail": "TELEGRAM_BOT_TOKEN is not configured. Create a bot with @BotFather and add it as an administrator of your channel.",
+                "configured": False,
+            },
+            status=503,
+        )
+
+    try:
+        _poll_telegram_channel(requests_lib, token)
+        stored = [
+            _serialize_telegram_report(doc)
+            for doc in _db()["telegram_reports"]
+            .find()
+            .sort("telegram_date", -1)
+            .limit(100)
+        ]
+        return JsonResponse({"count": len(stored), "reports": stored})
+    except Exception as e:
+        return JsonResponse(
+            {"detail": f"Telegram channel error: {e}", "configured": True},
+            status=502,
+        )
+
+
+@require_GET
+def telegram_image(request):
+    """Proxy a channel-post image so the bot token is never exposed."""
+    import requests as requests_lib
+
+    message_id = request.GET.get("message_id")
+    if not message_id:
+        return _error("message_id is required", status=400)
+    try:
+        message_id = int(message_id)
+    except ValueError:
+        return _error("message_id must be an integer", status=400)
+
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    if not token:
+        return _error("Telegram is not configured", status=503)
+
+    doc = _db()["telegram_reports"].find_one({"message_id": message_id})
+    if not doc or not doc.get("file_path"):
+        return _error("Image not found", status=404)
+
+    try:
+        response = requests_lib.get(
+            f"https://api.telegram.org/file/bot{token}/{doc['file_path']}",
+            timeout=60,
+        )
+    except Exception as e:
+        return _error(f"Could not fetch image from Telegram: {e}", status=502)
+    if response.status_code != 200:
+        return _error("Could not fetch image from Telegram", status=502)
+    return HttpResponse(
+        response.content,
+        content_type=doc.get("mime_type") or "image/jpeg",
+    )
+
+
 def _decode_image_urls(urls):
     """Try to decode a hidden message from each URL; return the first hit."""
     from io import BytesIO
