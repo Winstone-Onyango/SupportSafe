@@ -124,8 +124,10 @@ export function Avatar(props) {
     setAnimation(message.animation);
     setFacialExpression(message.facialExpression);
     setLipsync(message.lipsync);
-    const audio = new Audio('data:audio/mp3;base64,' + message.audio);
-    audio.play();
+    if (message.audio) {
+      const audio = new Audio('data:audio/mp3;base64,' + message.audio);
+      audio.play().catch((e) => console.warn('Audio playback failed:', e));
+    }
     setAudio(audio);
     audio.onended = onMessagePlayed;
   }, [message]);
