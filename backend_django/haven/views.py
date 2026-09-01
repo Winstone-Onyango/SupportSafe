@@ -298,6 +298,14 @@ def hashtag_reports(request):
     try:
         hashtag = request.GET.get("hashtag", DEFAULT_HASHTAG)
         max_results = int(request.GET.get("max_results", 25))
+        if not os.getenv("TWITTER_BEARER_TOKEN"):
+            return JsonResponse(
+                {
+                    "detail": "TWITTER_BEARER_TOKEN is not configured. Add it to your .env file to enable hashtag monitoring.",
+                    "configured": False,
+                },
+                status=503,
+            )
         posts = search_posts_by_hashtag(hashtag, max_results)
 
         reports = []
@@ -329,9 +337,12 @@ def hashtag_reports(request):
             {"hashtag": hashtag, "count": len(reports), "reports": reports}
         )
     except TwitterAPIError as e:
+        # Credentials are present but the Twitter/X API rejected the request
+        # (e.g. 402 credits depleted, 401 invalid token, 429 rate limit).
+        # Report it as a real API error instead of "not configured".
         return JsonResponse(
-            {"detail": f"Error searching hashtag: {e}", "configured": False},
-            status=503,
+            {"detail": f"Error searching hashtag: {e}", "configured": True},
+            status=502,
         )
     except Exception as e:
         return _error(f"Error retrieving hashtag reports: {e}")

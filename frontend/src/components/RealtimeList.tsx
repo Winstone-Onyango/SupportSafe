@@ -27,11 +27,47 @@ interface HashtagReport {
 
 interface LocalPost {
   _id?: string;
+  // MultiStep form schema
   Name?: string;
   'Severity of domestic violence'?: string;
   'Nature of domestic violence'?: string;
-  status?: string;
   current_situation?: string;
+  // save-extracted-data / API schema
+  name?: string;
+  severity?: string;
+  description?: string;
+  culprit?: string;
+  other_info?: string;
+  location?: string;
+  status?: string;
+  // /text-decomposition schema
+  decomposed?: Record<string, string>;
+}
+
+function postName(post: LocalPost) {
+  return post.Name || post.name || post.decomposed?.Name || 'Anonymous';
+}
+
+function postSeverity(post: LocalPost) {
+  return (
+    post['Severity of domestic violence'] ||
+    post.severity ||
+    post.decomposed?.['Severity of domestic violence'] ||
+    'Unknown'
+  );
+}
+
+function postNature(post: LocalPost) {
+  return (
+    post['Nature of domestic violence'] ||
+    post.description ||
+    post.culprit ||
+    post.other_info ||
+    post.current_situation ||
+    post.decomposed?.['Nature of domestic violence'] ||
+    post.decomposed?.['Culprit details'] ||
+    '—'
+  );
 }
 
 function severityBadge(severity?: string) {
@@ -230,19 +266,17 @@ function RealtimeList() {
                 className="rounded-lg border bg-white dark:bg-slate-800 dark:border-slate-700 p-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4"
               >
                 <span className="font-medium w-40 truncate">
-                  {post.Name || 'Anonymous'}
+                  {postName(post)}
                 </span>
                 <span
                   className={`text-[10px] px-2 py-1 rounded-full w-fit ${severityBadge(
-                    post['Severity of domestic violence']
+                    postSeverity(post)
                   )}`}
                 >
-                  {post['Severity of domestic violence'] || 'Unknown'}
+                  {postSeverity(post)}
                 </span>
                 <span className="text-sm text-gray-600 dark:text-gray-300 flex-1 truncate">
-                  {post['Nature of domestic violence'] ||
-                    post.current_situation ||
-                    '—'}
+                  {postNature(post)}
                 </span>
                 <span className="text-xs uppercase text-gray-400">
                   {post.status || 'pending'}

@@ -1,0 +1,5 @@
+[01/Sep/2026 15:35:39] "GET /get-admin-posts HTTP/1.1" 200 2085
+Bad Gateway: /hashtag-reports
+[01/Sep/2026 15:35:40] "GET /hashtag-reports?hashtag=IloveSupportSafe&max_results=25 HTTP/1.1" 502 97
+[01/Sep/2026 15:38:06] "GET /get-admin-posts HTTP/1.1" 200 2085
+[01/Sep/2026 15:44:57,367] - Broken pipe from ('127.0.0.1', 55074)
