@@ -1,4 +1,2 @@
-Bad Gateway: /send-to-telegram
-[01/Sep/2026 17:45:03] "POST /send-to-telegram HTTP/1.1" 502 61
-[01/Sep/2026 17:45:08] "GET /telegram-reports HTTP/1.1" 200 2208
-[01/Sep/2026 17:45:23] "GET /telegram-reports HTTP/1.1" 200 2208
+[01/Sep/2026 18:55:48] "POST /send-to-telegram HTTP/1.1" 200 37
+[01/Sep/2026 18:55:52] "GET /telegram-reports HTTP/1.1" 200 3554

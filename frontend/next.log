@@ -1,0 +1,26 @@
+
+> frontend@0.1.0 dev
+> next dev
+
+   ▲ Next.js 15.0.2
+   - Local:        http://localhost:3000
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 3.9s
+ ✓ Compiled /src/middleware in 285ms (91 modules)
+ ○ Compiling /api/generate-image ...
+ ✓ Compiled /api/generate-image in 2.7s (410 modules)
+Received data: { generatedText: 'test', imagePrompt: 'a calm ocean at dawn' }
+(node:16356) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ POST /api/generate-image 200 in 56176ms
+ ○ Compiling / ...
+ ✓ Compiled / in 4.4s (869 modules)
+ GET / 200 in 877ms
+ ✓ Compiled in 857ms (416 modules)
+ ✓ Compiled /favicon.ico in 248ms (494 modules)
+ GET /favicon.ico 200 in 424ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 633ms (858 modules)
+ GET / 404 in 1190ms
