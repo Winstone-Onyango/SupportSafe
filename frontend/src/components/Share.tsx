@@ -81,10 +81,11 @@ function Share({ imageURL, resText, setShared }: ShareProps) {
 
   /**
    * TELEGRAM CHANNEL FLOW:
-   * The encoded image + caption are posted directly to the SupportSafe
-   * Telegram channel through the backend bot, so the monitoring team always
-   * sees it. If the backend bot is not configured yet, we fall back to the
-   * manual share intent so the victim is never blocked.
+   * The encoded image + caption are posted DIRECTLY to the SupportSafe
+   * Telegram channel through the backend bot - the victim just clicks once
+   * and the report appears in the channel. If the bot cannot post (e.g. it
+   * has not been added as a channel admin), the victim sees a clear error
+   * instead of the generic share dialog.
    */
   const handleShareTelegram = async () => {
     if (!encodedImage) return;
@@ -99,21 +100,13 @@ function Share({ imageURL, resText, setShared }: ShareProps) {
         return;
       }
     } catch (error: unknown) {
-      // 503 = bot not configured yet -> fall back to manual sharing below.
-      // Other errors also fall back so the victim is never blocked.
-      console.error(
-        'Telegram channel post failed, falling back to manual share:',
-        error
-      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const detail =
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (error as any)?.response?.data?.detail ||
+        'Could not post to the Telegram channel. Please try again later.';
+      toast.error(detail);
     }
-    const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(
-      encodedImage
-    )}&text=${encodeURIComponent(shareCaption)}`;
-    window.open(telegramShareUrl, '_blank');
-    toast(
-      `Shared via Telegram. Remember to post it in the SupportSafe channel with #${REPORT_HASHTAG}.`
-    );
-    setShared(true);
   };
 
   const handleShareTwitter = () => {

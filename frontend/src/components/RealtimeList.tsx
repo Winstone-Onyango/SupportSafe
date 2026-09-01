@@ -12,7 +12,6 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import SavedReports from './SavedReports';
 import { REPORT_HASHTAG } from './Share';
 
 interface HashtagReport {
@@ -65,6 +64,15 @@ function RealtimeList() {
   }, [load]);
 
   const decodedCount = (reports ?? []).filter((r) => r.has_message).length;
+
+  // Twitter/X hashtag monitoring is dormant while the X API is unavailable
+  // (not configured or out of credits). The whole section hides itself so no
+  // payment errors clutter the dashboard - and reappears automatically once
+  // the API works again. Saved reports and Telegram live in their own
+  // sections on the dashboard page.
+  if (!twitterConfigured || error) {
+    return null;
+  }
 
   if (loading) {
     return (
@@ -190,8 +198,6 @@ function RealtimeList() {
         )}
       </div>
 
-      {/* All saved victim reports: full details, Google Maps, urgency sorting */}
-      <SavedReports />
     </div>
   );
 }

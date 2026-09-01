@@ -1,9 +1,4 @@
-[01/Sep/2026 17:20:58] "GET /telegram-reports HTTP/1.1" 200 27
-[01/Sep/2026 17:21:00] "GET /get-admin-posts HTTP/1.1" 200 2085
-[01/Sep/2026 17:21:09] "GET /telegram-reports HTTP/1.1" 200 27
-Not Found: /telegram-image
-[01/Sep/2026 17:21:11] "GET /telegram-image?message_id=1 HTTP/1.1" 404 29
-[01/Sep/2026 17:24:08] "GET /telegram-reports HTTP/1.1" 200 27
-[01/Sep/2026 17:24:08] "GET /get-admin-posts HTTP/1.1" 200 2085
-Bad Gateway: /hashtag-reports
-[01/Sep/2026 17:24:09] "GET /hashtag-reports?hashtag=IloveSupportSafe HTTP/1.1" 502 97
+Bad Gateway: /send-to-telegram
+[01/Sep/2026 17:45:03] "POST /send-to-telegram HTTP/1.1" 502 61
+[01/Sep/2026 17:45:08] "GET /telegram-reports HTTP/1.1" 200 2208
+[01/Sep/2026 17:45:23] "GET /telegram-reports HTTP/1.1" 200 2208

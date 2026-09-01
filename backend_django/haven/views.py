@@ -296,14 +296,23 @@ def send_to_telegram(request):
         )
 
     try:
+        # Download the image here and upload the bytes. Telegram's servers
+        # sometimes cannot fetch certain URLs themselves, so this is the
+        # reliable path.
+        image_resp = requests_lib.get(image_url, timeout=60)
+        if image_resp.status_code != 200:
+            return _error(
+                f"Could not download the image to post (HTTP {image_resp.status_code}).",
+                status=502,
+            )
         response = requests_lib.post(
             f"https://api.telegram.org/bot{token}/sendPhoto",
-            json={
+            data={
                 "chat_id": channel,
-                "photo": image_url,
                 "caption": caption[:1024],  # Telegram caption limit
             },
-            timeout=60,
+            files={"photo": ("report.png", image_resp.content)},
+            timeout=120,
         )
         payload = response.json()
         if not payload.get("ok"):
@@ -316,7 +325,11 @@ def send_to_telegram(request):
         # (bots never receive their own messages via getUpdates).
         try:
             _store_channel_post(
-                _db()["telegram_reports"], requests_lib, token, result
+                _db()["telegram_reports"],
+                requests_lib,
+                token,
+                result,
+                extra_urls=[image_url],  # original encoded image for decoding
             )
         except Exception as store_error:
             print(f"Could not index the Telegram channel post: {store_error}")
@@ -336,7 +349,7 @@ def send_to_telegram(request):
 TELEGRAM_OFFSET = {"value": 0}
 
 
-def _store_channel_post(collection, requests_lib, token, post):
+def _store_channel_post(collection, requests_lib, token, post, extra_urls=None):
     """Decode and index one channel post. Safe to call repeatedly (upsert)."""
     import re
 
@@ -366,11 +379,15 @@ def _store_channel_post(collection, requests_lib, token, post):
         mime_type = document.get("mime_type")
 
     # Candidate URLs to decode: links shared in the text (e.g. the Supabase
-    # link of the encoded image) plus the attached image itself.
+    # link of the encoded image), any extra URLs from the caller, and the
+    # attached image itself (last resort - photos are re-encoded).
     candidate_urls = [
         url.rstrip(").,")
         for url in re.findall(r"https?://\S+", text)
     ]
+    for url in extra_urls or []:
+        if url not in candidate_urls:
+            candidate_urls.append(url)
 
     file_path = None
     if image_file_id:

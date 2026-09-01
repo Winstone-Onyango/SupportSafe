@@ -1,6 +1,7 @@
 'use client';
 
 import RealtimeList from '@/components/RealtimeList';
+import SavedReports from '@/components/SavedReports';
 import TelegramReports from '@/components/TelegramReports';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -59,7 +60,10 @@ function Page() {
   return (
     <div className=" flex flex-col justify-center mx-auto max-w-5xl w-full p-4">
       <LiveTitleNoSSR />
+      {/* Twitter hashtag reports (renders nothing while the X API is unavailable) */}
       <RealtimeList />
+      {/* All saved victim reports: full details, Google Maps, urgency sorting */}
+      <SavedReports />
       {/* Dedicated Telegram channel monitoring section */}
       <TelegramReports />
     </div>
