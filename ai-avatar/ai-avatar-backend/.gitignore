@@ -5,3 +5,6 @@ audios/message_*
 Rhubarb-Lip-Sync-1.13.0-Windows
 Rhubarb-Lip-Sync-1.13.0-Windows.zip
 tantrotsav-410809-55e990923330.json
+*.log
+.DS_Store
+
