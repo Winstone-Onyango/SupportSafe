@@ -1,7 +1,7 @@
 import { exec } from 'child_process';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { existsSync } from 'fs';
+import { existsSync, readdirSync } from 'fs';
 import voice from 'elevenlabs-node';
 import express from 'express';
 import { promises as fs } from 'fs';
@@ -29,18 +29,47 @@ const voiceID = process.env.ELEVEN_LABS_VOICE_ID || 'cgSgspJ2msm6clMCkdW9';
 // Rhubarb Lip Sync executable. Download the Windows build from
 // https://github.com/DanielSWolf/rhubarb-lip-sync/releases (v1.13.0), extract
 // it into this backend folder (or set RHUBARB_PATH to the rhubarb.exe path).
-const rhubarbCandidates = process.env.RHUBARB_PATH
-  ? [process.env.RHUBARB_PATH]
-  : [
-      path.join(__dirname, 'Rhubarb-Lip-Sync-1.13.0-Windows', 'rhubarb.exe'),
-      path.join(
-        __dirname,
-        'Rhubarb-Lip-Sync-1.13.0-Windows',
-        'Rhubarb-Lip-Sync-1.13.0-Windows',
-        'rhubarb.exe'
-      ),
-    ];
-const rhubarbPath = rhubarbCandidates.find((p) => existsSync(p)) || rhubarbCandidates[0];
+// On Linux hosts (Docker/Render/Railway) the binary is auto-discovered under
+// /opt/rhubarb regardless of the zip's internal folder layout.
+const findRhubarbBinary = (dir) => {
+  const stack = [dir];
+  while (stack.length) {
+    const current = stack.pop();
+    let entries;
+    try {
+      entries = readdirSync(current, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+    for (const entry of entries) {
+      const full = path.join(current, entry.name);
+      if (entry.isDirectory()) {
+        const found = findRhubarbBinary(full);
+        if (found) return found;
+      } else if (entry.name === 'rhubarb' || entry.name === 'rhubarb.exe') {
+        return full;
+      }
+    }
+  }
+  return null;
+};
+
+const rhubarbCandidates = [
+  ...(process.env.RHUBARB_PATH ? [process.env.RHUBARB_PATH] : []),
+  path.join(__dirname, 'Rhubarb-Lip-Sync-1.13.0-Windows', 'rhubarb.exe'),
+  path.join(
+    __dirname,
+    'Rhubarb-Lip-Sync-1.13.0-Windows',
+    'Rhubarb-Lip-Sync-1.13.0-Windows',
+    'rhubarb.exe'
+  ),
+  // Linux deployment: extracted into /opt/rhubarb by the Dockerfile
+  ...(['/opt/rhubarb'].filter((dir) => existsSync(dir))),
+];
+const rhubarbPath =
+  rhubarbCandidates.find((p) => existsSync(p)) ||
+  findRhubarbBinary('/opt/rhubarb') ||
+  rhubarbCandidates[0];
 
 const app = express();
 app.use(express.json());

@@ -1,0 +1,7 @@
+node_modules
+.env
+audios
+Rhubarb-Lip-Sync-1.13.0-Windows
+Rhubarb-Lip-Sync-1.13.0-Windows.zip
+*.log
+.DS_Store
