@@ -43,7 +43,7 @@ function Header() {
             <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-2xl lg:max-w-2xl mx-auto lg:mx-0">
               If you’re facing abuse, you don’t have to face it alone. SupportSafe
               gives you a discreet way to seek help, understand your rights, and
-              find a safe space to talk and receive emotional support — without
+              find a safe space to talk and receive emotional support without
               judgment and without having to explain everything at once.
             </p>
 
