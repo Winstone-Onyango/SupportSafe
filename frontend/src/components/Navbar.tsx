@@ -51,7 +51,7 @@ function NavContent({ pathname }: { pathname: string }) {
               Law Bot
             </Link>
             <Link
-              href="https://ai-avatar-frontend-coral.vercel.app/"
+              href="https://support-safe.vercel.app/"
               className={linkClass('/therapybot')}
             >
               Therapy Bot
