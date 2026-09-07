@@ -1,0 +1,28 @@
+SupportSafe AI Avatar backend listening on port 3001
+Gemini: configured | ElevenLabs: configured | Model: gemini-3.6-flash
+Parsed JSON response: [
+  {
+    text: "Hello! I'm doing well, thank you for asking.",
+    facialExpression: 'smile',
+    animation: 'Talking_0'
+  },
+  {
+    text: "I'm right here and ready to support you with whatever is on your mind today.",
+    facialExpression: 'supportive',
+    animation: 'Talking_1'
+  },
+  {
+    text: 'How are you feeling right now?',
+    facialExpression: 'calm',
+    animation: 'Talking_2'
+  }
+]
+Starting conversion for message 0
+Conversion done in 364ms
+Lip sync done in 2858ms
+Starting conversion for message 1
+Conversion done in 279ms
+Lip sync done in 2068ms
+Starting conversion for message 2
+Conversion done in 301ms
+Lip sync done in 1922ms
