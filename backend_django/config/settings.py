@@ -1,8 +1,7 @@
 """
 Django settings for the SupportSafe Django backend (config project).
 
-This backend mirrors the FastAPI backend in `backend/` and exposes the same
-HTTP API on port 8000. MongoDB is accessed directly via pymongo (see
+This is the sole application backend and exposes the HTTP API on port 8000. MongoDB is accessed directly via pymongo (see
 `haven/db.py`); Django's ORM is not used for business data.
 """
 from pathlib import Path
