@@ -90,7 +90,7 @@ Navigating the legal system is intimidating. Our AI Legal Rights Bot provides:
 - **Protection Orders:** Plain-language explanations of how to file and enforce Protection Orders under the Kenyan *Protection Against Domestic Violence Act*.
 - **Custody & Rights:** Instant, clear assistance regarding child custody, co-parenting structures, and custody rights during emergency separation.
 - **Safe Referral Network:** Vetted referrals to pro-bono law organizations and GBV hotlines in Kenya.
-![alt text](<Confidential Legal AI.png>)
+![alt text](<Screenshot 2026-09-11 184202.png>)
 
 ### 3️⃣ 24/7 AI Support Companion (Trauma-Informed)
 *The Emotional Lifeline.*
