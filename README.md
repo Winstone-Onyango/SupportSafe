@@ -78,6 +78,10 @@ Many survivors cannot safely call a hotline or post openly. SupportSafe lets a u
 - **LLM Expansion:** An integrated Large Language Model expands these keywords into a full, coherent distress message.
 - **Invisible Embedding:** The message is programmatically embedded into an everyday photo (a flower, a sunset, a meal) using **steganography**. 
 - **Zero Suspicion:** The image looks completely ordinary and can be posted publicly. A background cron job scans for these images, decodes the signal, and alerts responders.
+![alt text](<Discreete SOS Messaging 1.png>)
+![alt text](<Discreete SOS Messaging 2.png>)
+![alt text](<Discreete SOS Messaging 4.png>)
+![alt text](<Discreete SOS Messaging 6.png>)
 
 ### 2️⃣ Confidential Legal AI (RAG + Kenyan Law)
 *Demystifying Kenyan Statutes.*
@@ -86,6 +90,7 @@ Navigating the legal system is intimidating. Our AI Legal Rights Bot provides:
 - **Protection Orders:** Plain-language explanations of how to file and enforce Protection Orders under the Kenyan *Protection Against Domestic Violence Act*.
 - **Custody & Rights:** Instant, clear assistance regarding child custody, co-parenting structures, and custody rights during emergency separation.
 - **Safe Referral Network:** Vetted referrals to pro-bono law organizations and GBV hotlines in Kenya.
+![alt text](<Confidential Legal AI.png>)
 
 ### 3️⃣ 24/7 AI Support Companion (Trauma-Informed)
 *The Emotional Lifeline.*
@@ -94,7 +99,7 @@ Due to severe social stigma, many survivors never seek traditional therapy. Our 
 - **Instant Grounding Techniques:** Interactive guidance on deep breathing, calming exercises, and cognitive refocusing during acute distress.
 - **Trauma-Informed Responses:** Carefully tuned conversational paths that offer validation, reduce guilt, and foster emotional safety.
 - **No Judgment:** Available 24/7, it never judges, breaks confidentiality, or carries bias.
-
+![alt text](<AI Support companion.png>) 
 ---
 
 ## 🏗 System Architecture
