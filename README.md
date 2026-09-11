@@ -2,8 +2,8 @@
 
 <!-- Static, Visually Appealing Title -->
 <h1>
-  <span style="font-family: 'Georgia', serif; font-size: 4em; font-weight: 900; background: linear-gradient(135deg, #1E3A8A, #3B82F6, #06B6D4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-fill-color: transparent; letter-spacing: -2px;">
-    SupportSafe
+  <span style="font-family: 'Georgia', serif; font-size: 4em; font-weight: 900; letter-spacing: -2px;">
+    <span style="background: linear-gradient(135deg, #1E3A8A, #3B82F6, #06B6D4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-fill-color: transparent;">Support</span><span style="color: #000000;">Safe</span>
   </span>
 </h1>
 
@@ -22,44 +22,36 @@
 
 <br><br>
 
-**SupportSafe** is a discreet, secure, and compassionate Gender-Based Violence (GBV) support platform. It empowers survivors in Kenya to seek help invisibly, understand their legal rights, and access emotional support—all while bypassing abuser surveillance and societal stigma.
+**SupportSafe** is a discreet, secure, and compassionate Gender-Based Violence (GBV) support platform. It empowers survivors in Kenya to seek help invisibly, understand their legal rights, and access emotional support, all while bypassing abuser surveillance and societal stigma.
+
+Born from the urgent need to address Kenya's GBV crisis, SupportSafe combines **steganography**, **Large Language Models (LLMs)**, **Retrieval-Augmented Generation (RAG)**, and **AI avatar therapy** to create a multi-layered safety net for those who cannot safely reach out through conventional channels.
 
 </div>
 
 ---
 
-## 📖 Table of Contents
-
-- [The Problem](#-the-problem)
-- [The Solution](#-the-solution)
-- [Core Features](#-core-features)
-- [System Architecture](#-system-architecture)
-- [Tech Stack](#-tech-stack)
-- [How It Works](#-how-it-works)
-- [The Team & Vision](#-the-team--vision)
-- [Contributing](#-contributing)
-- [Contact](#-contact)
-
----
-
 ## 🚨 The Problem
 
-In Kenya, domestic abuse is surging, but the vast majority of survivors suffer in silence. 
+In Kenya, domestic abuse is surging, but the vast majority of survivors suffer in silence:
 
-- **75%** of survivors never seek formal medical, legal, or psychological help.
+- **75%** of survivors never seek formal help.
 - **34%** of women and **24%** of men have experienced severe physical assault since age 15.
 - **13%** of women and **7%** of men have survived forced sexual abuse.
 
-**Why do existing interventions fail?**
-1. **Abuser Surveillance:** Perpetrators routinely monitor phone logs, social media, and messages. Calling a hotline is often too dangerous.
-2. **Social Stigma:** Extreme societal judgment prevents survivors (especially men and marginalized groups) from stepping forward.
-3. **Intimidating Legal Barriers:** Navigating protection orders and custody rights without expensive legal counsel is overwhelming.
+### Why Existing Interventions Fail
+
+| Barrier | Reality |
+|---------|---------|
+| **Abuser Surveillance** | Perpetrators monitor phone logs, messages, and location data. Calling a hotline leaves a trace. |
+| **Social Stigma** | Extreme judgment prevents survivors—especially men and marginalized groups—from stepping forward. |
+| **Legal Intimidation** | Protection orders and custody rights feel impossible without expensive legal counsel. |
+| **Resource Scarcity** | GBV counselors and legal aid are concentrated in urban centers, leaving rural survivors with no access. |
 
 ---
 
 ## 💡 The Solution
 
-SupportSafe provides a **secure, hidden pathway to safety and restoration**. It operates on three core pillars designed to protect the survivor at every step.
+SupportSafe provides a **secure, hidden pathway to safety and restoration** through three interconnected pillars.
 
 <div align="center">
   <img src="https://img.shields.io/badge/Discreet%20SOS-Encoding%20Distress%20Signals-1E3A8A?style=flat-square" />
@@ -71,40 +63,67 @@ SupportSafe provides a **secure, hidden pathway to safety and restoration**. It 
 
 ## ✨ Core Features
 
-### 1️⃣ Discreet SOS Messaging (Steganography + LLM)
+### 1️⃣ Discreet SOS Messaging
 *The Silent Payload.*
 
-Many survivors cannot safely call a hotline or post openly. SupportSafe lets a user type a few keywords describing the situation. 
-- **LLM Expansion:** An integrated Large Language Model expands these keywords into a full, coherent distress message.
-- **Invisible Embedding:** The message is programmatically embedded into an everyday photo (a flower, a sunset, a meal) using **steganography**. 
-- **Zero Suspicion:** The image looks completely ordinary and can be posted publicly. A background cron job scans for these images, decodes the signal, and alerts responders.
-![alt text](<Discreete SOS Messaging 1.png>)
-![alt text](<Discreete SOS Messaging 2.png>)
-![alt text](<Discreete SOS Messaging 4.png>)
-![alt text](<Discreete SOS Messaging 6.png>)
+A survivor types a few keywords about their situation. An LLM expands them into a full distress narrative. This message is embedded invisibly into an everyday photo using **steganography** and posted publicly with the hashtag **#IloveSupportSafe**. To the abuser, it looks like a harmless photo. To SupportSafe, it's a cry for help.
 
-### 2️⃣ Confidential Legal AI (RAG + Kenyan Law)
+**The Pipeline:**
+
+1. **Keyword Input:** Survivor types minimal keywords (e.g., "husband hitting me, two children, Kibera").
+2. **LLM Expansion:** The message is expanded into a complete first-person distress narrative with all critical details—name, location, frequency, severity, perpetrator description.
+3. **Image Generation:** A harmless carrier image is generated — a flower, a sunset, a landscape.
+4. **Steganographic Encoding:** The distress message is embedded into the **least significant bit (LSB)** of every pixel's red channel. Visually, the image is identical.
+5. **Social Media Posting:** The encoded image is posted to X (formerly Twitter) or Telegram SupportSafe Channel with Hashtag **#IloveSupportSafe**. Looks completely ordinary.
+6. **Monitoring & Decoding:** A background scanner finds the hashtag, downloads the image, and applies **reverse steganography** to recover the message.
+7. **Structured Processing:** The decoded message is parsed into 11 structured fields and stored in MongoDB.
+8. **Responder Dashboard:** Authorized responders see all reports in real-time, sorted by urgency, with tools to forward cases to partner organizations.
+
+![Discreet SOS Messaging](<Discreete SOS Messaging 1.png>)
+
+![Discreet SOS Messaging](<Discreete SOS Messaging 2.png>)
+
+![alt text](<Discreete SOS Messaging 3-1.png>)
+
+![alt text](<Discreete SOS Messaging 4-1.png>)
+
+![alt text](<Discreete SOS Messaging 6-1.png>)
+
+### 2️⃣ Confidential Legal AI
 *Demystifying Kenyan Statutes.*
 
-Navigating the legal system is intimidating. Our AI Legal Rights Bot provides:
-- **Protection Orders:** Plain-language explanations of how to file and enforce Protection Orders under the Kenyan *Protection Against Domestic Violence Act*.
-- **Custody & Rights:** Instant, clear assistance regarding child custody, co-parenting structures, and custody rights during emergency separation.
-- **Safe Referral Network:** Vetted referrals to pro-bono law organizations and GBV hotlines in Kenya.
-![alt text](<Screenshot 2026-09-11 184202.png>)
+Powered by **Retrieval-Augmented Generation (RAG)**, the Legal Rights Bot provides instant, plain-language guidance grounded in actual Kenyan law.
 
-### 3️⃣ 24/7 AI Support Companion (Trauma-Informed)
-*The Emotional Lifeline.*
+**How It Works:**
+- Key legal document (The Constitution) is chunked and stored as vector embeddings in MongoDB Atlas.
+- When a survivor asks a question, the system performs a semantic search to retrieve the most relevant legal passages.
+- An LLM generates a clear, accurate answer grounded in retrieved context—not generic hallucinations.
 
-Due to severe social stigma, many survivors never seek traditional therapy. Our AI companion serves as a secure, confidential first point of contact.
-- **Instant Grounding Techniques:** Interactive guidance on deep breathing, calming exercises, and cognitive refocusing during acute distress.
-- **Trauma-Informed Responses:** Carefully tuned conversational paths that offer validation, reduce guilt, and foster emotional safety.
-- **No Judgment:** Available 24/7, it never judges, breaks confidentiality, or carries bias.
-![alt text](<AI Support companion.png>) 
+![Legal AI](<Screenshot 2026-09-11 184202.png>)
+
+![alt text](<Screenshot 2026-09-11 235041.png>)
+
+### 3️⃣ AI Therapeutic Avatar
+*Face-to-Face Healing:* secure, confidential first point of contact for survivors who cannot, or are not ready to speak to another human being.
+
+3D lifelike avatar that enables face-to-face-style therapeutic conversations in a completely safe, anonymous environment.
+
+**How It Works:**
+- The survivor's messages are processed by the LLM, generating therapeutic responses.
+- Text is converted to speech and processed through **Rhubarb Lip Sync** to generate viseme timelines.
+- A 3D avatar renders in the browser using **Three.js**, with synchronized lip movements—creating a natural, lifelike speaking animation.
+
+**Why an Avatar:**
+- **Emotional Connection:** A face and voice create a stronger sense of being heard—critical for trauma recovery.
+- **Reduced Isolation:** Provides a "presence" text alone cannot replicate.
+- **Complete Anonymity:** No judgment, no fatigue, no risk of confidentiality breach.
+- **Accessibility:** Works on any browser—no special hardware required.
+
+![alt text](<AI Support companion-1.png>)
+
 ---
 
 ## 🏗 System Architecture
-
-SupportSafe is engineered for **discretion, healing, and empowerment**.
 
 ```mermaid
 graph TD
@@ -112,10 +131,13 @@ graph TD
     B -->|Full Distress Narrative| C(Steganography Engine)
     C -->|Innocuous Image + Hidden Payload| D[Public Social Media Post]
     
-    E[Cron Scanner] -->|Detects Image| F[Reverse Steganography]
+    E[Cron Scanner] -->|Detects #IloveSupportSafe| F[Reverse Steganography]
     F -->|Extracts Message| G[NLP Decomposition]
     G -->|Structured Data| H[(MongoDB)]
     H -->|Urgency Priority| I[Responder Dashboard]
     
     A -->|Direct Chat| J[AI Support Companion]
     A -->|Legal Queries| K[Legal Rights Bot RAG]
+    A -->|Therapy Session| L[AI Avatar]
+    L -->|Lip-Sync Audio| M[Rhubarb Lip Sync]
+    M -->|3D Rendered Response| A
