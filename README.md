@@ -1,410 +1,116 @@
-# SupportSafe
+<div align="center">
 
-**An AI-powered platform for gender-based violence (GBV) support, reporting, and awareness.**
+<!-- Static, Visually Appealing Title -->
+<h1>
+  <span style="font-family: 'Georgia', serif; font-size: 4em; font-weight: 900; background: linear-gradient(135deg, #1E3A8A, #3B82F6, #06B6D4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-fill-color: transparent; letter-spacing: -2px;">
+    SupportSafe
+  </span>
+</h1>
 
-SupportSafe is a full-stack application that combines a Django backend, Next.js frontend, and an AI avatar to help victims and survivors of gender-based violence. It provides secure reporting, AI-powered text analysis, steganography for hidden communication, and integration with social media for awareness campaigns.
+<!-- Typing Animation Subtitle -->
+<a href="https://git.io/typing-svg">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=22&pause=1000&color=3B82F6&center=true&vCenter=true&width=800&height=60&lines=A+Safer+Way+to+Seek+Help;Breaking+the+Silence+of+GBV;Discreet.+Secure.+Compassionate.;Empowering+Survivors+in+Kenya" alt="Typing SVG" />
+</a>
 
----
+<br>
 
-## Table of Contents
+<!-- Badges -->
+<img src="https://img.shields.io/badge/Status-In%20Development-3B82F6?style=for-the-badge&logo=git&logoColor=white" alt="Status" />
+<img src="https://img.shields.io/badge/Region-Kenya-06B6D4?style=for-the-badge&logo=googlemaps&logoColor=white" alt="Region" />
+<img src="https://img.shields.io/badge/Focus-GBV%20Support-1E3A8A?style=for-the-badge&logo=heart&logoColor=white" alt="Focus" />
+<img src="https://img.shields.io/badge/License-MIT-60A5FA?style=for-the-badge" alt="License" />
 
-- [Overview](#overview)
-- [Architecture](#architecture)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [API Endpoints](#api-endpoints)
-- [AI Avatar](#ai-avatar)
-- [Troubleshooting](#troubleshooting)
+<br><br>
 
----
+**SupportSafe** is a discreet, secure, and compassionate Gender-Based Violence (GBV) support platform. It empowers survivors in Kenya to seek help invisibly, understand their legal rights, and access emotional support—all while bypassing abuser surveillance and societal stigma.
 
-## Overview
-
-SupportSafe addresses gender-based violence through technology:
-
-1. **Secure Reporting** - Victims can submit reports stored securely in MongoDB
-2. **AI Analysis** - Gemini AI analyzes and structures victim reports
-3. **Steganography** - Hide secret messages in images for covert communication
-4. **Social Media Integration** - Post awareness messages on Twitter and Telegram
-5. **AI Avatar** - An interactive 3D avatar that guides users through the platform
+</div>
 
 ---
 
-## Architecture
+## 📖 Table of Contents
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        Browser (Client)                        │
-│                     http://localhost:3000                       │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    Next.js Frontend (:3000)                      │
-│  - React components with Material UI                            │
-
----
-
-## Features
-
-### Backend (Django)
-- **Authentication** - JWT-based register/login with secure password hashing
-- **Text Generation** - AI-powered expansion of victim reports using Gemini
-- **Image Generation** - Create illustrative images for posts
-- **Text Decomposition** - Extract structured data from free-text reports
-- **Steganography** - Hide and recover secret messages in PNG images
-- **Social Integration** - Post to Twitter and Telegram
-- **Admin Dashboard** - Manage and review reports
-- **Vector Search** - Find similar reports using embeddings
-- **Lawbot** - Upload and query legal documents (PDFs)
-
-### Frontend (Next.js)
-- **Responsive UI** - Material UI components with custom theming
-- **Authentication** - Clerk-powered sign-in/sign-up
-- **Dashboard** - View and manage reports
-- **Post Creation** - Submit new reports with AI assistance
-- **Community Forum** - View and interact with posts
-- **Support Resources** - Access help and information
-
-### AI Avatar
-- **3D Interactive Avatar** - Built with React Three Fiber
-- **Voice Interaction** - Speech recognition and synthesis
-- **Emotional Responses** - Avatar reacts to user input
+- [The Problem](#-the-problem)
+- [The Solution](#-the-solution)
+- [Core Features](#-core-features)
+- [System Architecture](#-system-architecture)
+- [Tech Stack](#-tech-stack)
+- [How It Works](#-how-it-works)
+- [The Team & Vision](#-the-team--vision)
+- [Contributing](#-contributing)
+- [Contact](#-contact)
 
 ---
 
-## Tech Stack
+## 🚨 The Problem
 
-| Layer | Technology |
-|-------|------------|
-| **Backend** | Python 3.14, Django 6.1 |
-| **Frontend** | Next.js 15, React 19, Material UI 6 |
-| **AI Avatar** | React Three Fiber, Vite, Three.js |
-| **Database** | MongoDB Atlas |
-| **Authentication** | JWT (backend), Clerk (frontend) |
-| **AI/ML** | Google Gemini, Groq |
-| **Storage** | Supabase |
-| **APIs** | Twitter/X API, Telegram Bot API |
+In Kenya, domestic abuse is surging, but the vast majority of survivors suffer in silence. 
 
----
+- **75%** of survivors never seek formal medical, legal, or psychological help.
+- **34%** of women and **24%** of men have experienced severe physical assault since age 15.
+- **13%** of women and **7%** of men have survived forced sexual abuse.
 
-## Project Structure
-
-```
-SupportSafe/
-├── backend_django/              # Django backend
-│   ├── config/                  # Project settings
-│   │   ├── settings.py          # Django configuration
-│   │   ├── urls.py              # Root URL routing
-│   │   ├── wsgi.py              # WSGI entry point
-│   │   └── asgi.py              # ASGI entry point
-│   ├── haven/                   # Main application
-│   │   ├── views.py             # API endpoint handlers
-│   │   ├── auth_api.py          # Authentication endpoints
-│   │   ├── db.py                # MongoDB connection
-│   │   ├── images.py            # Image generation endpoints
-│   │   ├── prompts.py           # AI prompt templates
-│   │   ├── urls.py              # App URL routing
-│   │   └── utils/               # Utility modules
-│   │       ├── common.py        # Shared helpers
-│   │       ├── embedding.py     # Vector embeddings
-│   │       ├── steganography.py # Image steganography
-│   │       ├── text_llm.py      # LLM integration
-│   │       ├── twitter.py       # Twitter API
-│   │       └── regex_ptr.py     # Regex patterns
-│   ├── manage.py                # Django management
-│   └── seed_admin.py            # Admin user seeder
-│
+**Why do existing interventions fail?**
+1. **Abuser Surveillance:** Perpetrators routinely monitor phone logs, social media, and messages. Calling a hotline is often too dangerous.
+2. **Social Stigma:** Extreme societal judgment prevents survivors (especially men and marginalized groups) from stepping forward.
+3. **Intimidating Legal Barriers:** Navigating protection orders and custody rights without expensive legal counsel is overwhelming.
 
 ---
 
-## Getting Started
+## 💡 The Solution
 
-### Prerequisites
+SupportSafe provides a **secure, hidden pathway to safety and restoration**. It operates on three core pillars designed to protect the survivor at every step.
 
-- **Python 3.14** - [Download](https://www.python.org/downloads/)
-- **Node.js 20+** - [Download](https://nodejs.org/)
-- **MongoDB Atlas** - [Create cluster](https://www.mongodb.com/atlas)
-- **npm** - Comes with Node.js
-
-### Installation
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Winstone-Onyango/SupportSafe.git
-   cd SupportSafe
-   ```
-
-2. **Set up Python virtual environment:**
-   ```bash
-   python -m venv .venv
-   .venv\Scripts\activate  # Windows
-   source .venv/bin/activate  # macOS/Linux
-   ```
-
-3. **Install backend dependencies:**
-   ```bash
-   pip install -r backend_django/requirements.txt
-   ```
-
-4. **Install frontend dependencies:**
-   ```bash
-   cd frontend
-   npm install
-   cd ..
-   ```
-
-5. **Install AI avatar dependencies:**
-   ```bash
-   cd ai-avatar/ai-avatar-backend
-   npm install
-   cd ../ai-avatar-frontend
-   npm install
-   cd ../..
-   ```
-
-### Environment Variables
-
-Create a `.env` file in the root directory with the following variables:
-
-```env
-# MongoDB Atlas
-MONGO_ENDPOINT=mongodb://username:password@cluster.mongodb.net:27017,...
-MONGO_DB_NAME=SupportSafe
-
-# Google Gemini AI
-GEMINI_API_KEY=your_gemini_api_key
-
-# Groq (optional, for additional LLM)
-GROQ_API_TOKEN=your_groq_token
-
-# Supabase Storage
-SUPABASE_URL=https://your-project.supabase.co/
-SUPABASE_KEY=your_supabase_key
-SUPABASE_STORAGE_BUCKET=generated-images
-
-# Telegram Bot
-TELEGRAM_BOT_TOKEN=your_bot_token
-TELEGRAM_CHANNEL_ID=@your_channel
-
-# Twitter/X API
-TWITTER_BEARER_TOKEN=your_bearer_token
-TWITTER_CONSUMER_KEY=your_consumer_key
-TWITTER_CONSUMER_SECRET=your_consumer_secret
-TWITTER_ACCESS_TOKEN=your_access_token
+<div align="center">
+  <img src="https://img.shields.io/badge/Discreet%20SOS-Encoding%20Distress%20Signals-1E3A8A?style=flat-square" />
+  <img src="https://img.shields.io/badge/Legal%20Rights%20Bot-Instant%20Guidance-3B82F6?style=flat-square" />
+  <img src="https://img.shields.io/badge/AI%20Companion-24%2F7%20Emotional%20Support-06B6D4?style=flat-square" />
+</div>
 
 ---
 
-## API Endpoints
+## ✨ Core Features
 
-### Authentication
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/auth/register` | Create new account |
-| POST | `/auth/login` | Login, receive JWT |
-| GET | `/auth/me` | Get current user profile |
+### 1️⃣ Discreet SOS Messaging (Steganography + LLM)
+*The Silent Payload.*
 
-### Core API
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/text-generation` | Expand report using Gemini |
-| POST | `/img-generation` | Generate image for post |
-| POST | `/text-decomposition` | Extract structured data |
-| POST | `/save-extracted-data` | Save report to database |
-| GET | `/get-post/<id>` | Get single post |
-| GET | `/get-admin-posts` | List all posts (admin) |
-| POST | `/close-issue/<id>` | Mark issue as resolved |
+Many survivors cannot safely call a hotline or post openly. SupportSafe lets a user type a few keywords describing the situation. 
+- **LLM Expansion:** An integrated Large Language Model expands these keywords into a full, coherent distress message.
+- **Invisible Embedding:** The message is programmatically embedded into an everyday photo (a flower, a sunset, a meal) using **steganography**. 
+- **Zero Suspicion:** The image looks completely ordinary and can be posted publicly. A background cron job scans for these images, decodes the signal, and alerts responders.
 
-### Steganography
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/encode` | Hide message in image |
-| POST | `/decode` | Recover message from image |
-| POST | `/encode-image` | Encode URL image with message |
+### 2️⃣ Confidential Legal AI (RAG + Kenyan Law)
+*Demystifying Kenyan Statutes.*
 
-### Social Media
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/send-message` | Post SOS tweet |
-| POST | `/send-to-telegram` | Forward to Telegram |
-| GET | `/telegram-reports` | List Telegram reports |
-| GET | `/telegram-image` | Get Telegram image |
-| GET | `/hashtag-reports` | Get tweets by hashtag |
+Navigating the legal system is intimidating. Our AI Legal Rights Bot provides:
+- **Protection Orders:** Plain-language explanations of how to file and enforce Protection Orders under the Kenyan *Protection Against Domestic Violence Act*.
+- **Custody & Rights:** Instant, clear assistance regarding child custody, co-parenting structures, and custody rights during emergency separation.
+- **Safe Referral Network:** Vetted referrals to pro-bono law organizations and GBV hotlines in Kenya.
 
-### AI Tools
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/generate-image` | Create image from prompt |
-| POST | `/generate-text` | Generate text with LLM |
-| POST | `/decompose` | Decompose free text |
-| POST | `/find-match` | Find similar posts |
-| POST | `/upload_embeddings` | Upload lawbot documents |
+### 3️⃣ 24/7 AI Support Companion (Trauma-Informed)
+*The Emotional Lifeline.*
+
+Due to severe social stigma, many survivors never seek traditional therapy. Our AI companion serves as a secure, confidential first point of contact.
+- **Instant Grounding Techniques:** Interactive guidance on deep breathing, calming exercises, and cognitive refocusing during acute distress.
+- **Trauma-Informed Responses:** Carefully tuned conversational paths that offer validation, reduce guilt, and foster emotional safety.
+- **No Judgment:** Available 24/7, it never judges, breaks confidentiality, or carries bias.
 
 ---
 
-## AI Avatar
+## 🏗 System Architecture
 
-The AI avatar provides an interactive 3D interface for users:
+SupportSafe is engineered for **discretion, healing, and empowerment**.
 
-**Features:**
-- 3D character rendered with React Three Fiber
-- Speech recognition for voice commands
-- Text-to-speech responses
-- Emotional state visualization
-
-**Running the avatar:**
-```bash
-cd ai-avatar/ai-avatar-backend
-npm start
-
-# In another terminal
-cd ai-avatar/ai-avatar-frontend
-npm run dev
-```
-
----
-
-## Database
-
-**MongoDB Atlas** is used with the following collections:
-
-- **users** - User accounts and profiles
-- **posts** - Reports and posts
-- **embeddings** - Vector embeddings for similarity search
-- **telegram_reports** - Reports from Telegram
-- **sessions** - Active user sessions
-
----
-
-## Troubleshooting
-
-### Common Issues
-
-**Django won't start:**
-- Check virtual environment is activated
-- Verify all packages installed: `pip install -r requirements.txt`
-- Check MongoDB connection string in `.env`
-
-**Frontend 500 error:**
-- Check `node_modules` exists: `npm install`
-- Verify `.env.local` has correct backend URL
-- Check browser console for specific errors
-
-**MongoDB connection failed:**
-- Whitelist your IP in MongoDB Atlas
-- Verify connection string format
-- Check network connectivity
-
-**AI services not working:**
-- Verify Gemini API key is valid
-- Check Groq token if using fallback
-- Ensure Supabase credentials are correct
-
-### Getting Help
-
-1. Check the logs in terminal output
-2. Review browser console (F12)
-3. Check Django logs: `backend_django_server.log`
-4. Open an issue on GitHub
-
----
-
-## License
-
-This project is part of a capstone project for Samsung AI.
-
----
-
-## Acknowledgments
-
-- Google Gemini for AI capabilities
-- MongoDB Atlas for database hosting
-- Supabase for storage
-- Clerk for authentication
-- React Three Fiber for 3D avatar
-
----
-
-**Developed by Winstone Onyango**
-TWITTER_ACCESS_TOKEN_SECRET=your_access_token_secret
-```
-
-### Running the Application
-
-**Option 1: One-command startup (Windows PowerShell):**
-```powershell
-.\run.ps1
-```
-
-**Option 2: Manual startup:**
-
-1. **Start Django backend:**
-   ```bash
-   cd backend_django
-   python manage.py runserver 127.0.0.1:8000
-   ```
-
-2. **Start Next.js frontend** (in a new terminal):
-   ```bash
-   cd frontend
-   npm run dev
-   ```
-
-3. **Access the application:**
-   - Frontend: http://localhost:3000
-   - Backend API: http://127.0.0.1:8000
-├── frontend/                    # Next.js frontend
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── api/             # API routes (proxy to Django)
-│   │   │   ├── community/       # Community forum
-│   │   │   ├── support/         # Support resources
-│   │   │   ├── signin/          # Sign in page
-│   │   │   ├── signup/          # Sign up page
-│   │   │   ├── layout.tsx       # Root layout
-│   │   │   └── page.tsx         # Home page
-│   │   ├── lib/
-│   │   │   ├── auth.ts          # Auth utilities
-│   │   │   └── utils.ts         # Helper functions
-│   │   └── middleware.ts        # Next.js middleware
-│   ├── .env.local               # Frontend environment
-│   └── package.json
-│
-├── ai-avatar/                   # AI Avatar
-│   ├── ai-avatar-backend/       # Node.js backend
-│   └── ai-avatar-frontend/      # Vite frontend
-│
-├── .env                         # Backend environment variables
-├── .env.example                 # Example environment file
-├── run.ps1                      # One-command startup script
-└── .gitignore
-```
-│  - Clerk authentication                                         │
-│  - API routes that proxy to Django backend                      │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    Django Backend (:8000)                        │
-│  - REST API endpoints                                           │
-│  - JWT authentication                                           │
-│  - MongoDB integration                                          │
-│  - AI/ML services (Gemini, Groq)                                │
-│  - Supabase storage                                             │
-│  - Twitter/X API                                                │
-│  - Telegram Bot API                                             │
-└─────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                       External Services                         │
-│  - MongoDB Atlas (database)                                     │
-│  - Google Gemini (text generation)                              │
-│  - Groq (language models)                                       │
-│  - Supabase (image storage)                                     │
-│  - Twitter/X API (social posting)                               │
-│  - Telegram Bot API (notifications)                             │
-└─────────────────────────────────────────────────────────────────┘
-```
+```mermaid
+graph TD
+    A[Survivor Device] -->|Types Keywords| B(LLM Expander)
+    B -->|Full Distress Narrative| C(Steganography Engine)
+    C -->|Innocuous Image + Hidden Payload| D[Public Social Media Post]
+    
+    E[Cron Scanner] -->|Detects Image| F[Reverse Steganography]
+    F -->|Extracts Message| G[NLP Decomposition]
+    G -->|Structured Data| H[(MongoDB)]
+    H -->|Urgency Priority| I[Responder Dashboard]
+    
+    A -->|Direct Chat| J[AI Support Companion]
+    A -->|Legal Queries| K[Legal Rights Bot RAG]
