@@ -84,6 +84,8 @@ def text_generation(request):
             f"Name: {data.get('name')}\n"
             # Phone number for authorities to call back
             f"Phone: {data.get('phone')}\n"
+            # Email for authorities to contact
+            f"Email: {data.get('email')}\n"
             # Where the victim is (address or lat,lng)
             f"Location: {data.get('location')}\n"
             # How long the abuse has been going on

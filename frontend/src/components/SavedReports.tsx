@@ -17,6 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getToken } from '@/lib/auth';
+import GoogleMap from '@/components/GoogleMap';
 
 /**
  * Admin dashboard view of every report saved by victims.
@@ -185,8 +186,6 @@ const parseCoordinates = (
   }
   return null;
 };
-
-const mapEmbedKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
 
 function DetailRow({
   icon,
@@ -394,16 +393,14 @@ function ReportCard({
                 </p>
               )}
             </div>
-            {hasCoords && mapEmbedKey && (
-              <div className="w-full sm:w-48 h-32 rounded-lg overflow-hidden border border-gray-300 dark:border-slate-600 shrink-0">
-                <iframe
-                  width="100%"
+            {hasCoords && (
+              <div className="w-full sm:w-56 h-36 rounded-lg overflow-hidden shrink-0">
+                <GoogleMap
+                  lat={geo.lat}
+                  lng={geo.lng}
+                  label={report.location}
                   height="100%"
-                  style={{ border: 0 }}
-                  loading="lazy"
-                  allowFullScreen
-                  referrerPolicy="no-referrer-when-downgrade"
-                  src={`https://www.google.com/maps/embed/v1/place?key=${mapEmbedKey}&q=${geo.lat},${geo.lng}&zoom=14`}
+                  zoom={14}
                 />
               </div>
             )}
@@ -498,22 +495,20 @@ function ReportCard({
               value={report.otherInfo}
             />
           )}
-          {hasCoords && mapEmbedKey && (
+          {hasCoords && (
             <div className="pt-2">
               <DetailRow
                 icon={<MapPin size={15} />}
                 label="Location on Map"
                 value={report.location}
               />
-              <div className="mt-2 rounded-lg overflow-hidden border border-gray-300 dark:border-slate-600">
-                <iframe
-                  width="100%"
-                  height="200"
-                  style={{ border: 0 }}
-                  loading="lazy"
-                  allowFullScreen
-                  referrerPolicy="no-referrer-when-downgrade"
-                  src={`https://www.google.com/maps/embed/v1/place?key=${mapEmbedKey}&q=${geo.lat},${geo.lng}&zoom=14`}
+              <div className="mt-2">
+                <GoogleMap
+                  lat={geo.lat}
+                  lng={geo.lng}
+                  label={report.location}
+                  height="220px"
+                  zoom={15}
                 />
               </div>
             </div>

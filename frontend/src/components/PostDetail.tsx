@@ -14,6 +14,7 @@ import {
   Check,
 } from 'lucide-react';
 import CustomTimeline from './Timeline';
+import GoogleMap from './GoogleMap';
 import toast from 'react-hot-toast';
 
 interface Post {
@@ -89,7 +90,6 @@ function PostDetail({ id }: { id: string }) {
   }
   const cleanLoc = cleanText(post.Location);
   const [lat, lng] = cleanLoc.split(',').map(Number);
-  const mapUrl = `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_MAP_KEY}&q=${lat},${lng}`;
 
   const handleCloseIssue = async (issueId: string) => {
     try {
@@ -143,7 +143,7 @@ function PostDetail({ id }: { id: string }) {
           </div>
           <p>{post['Preferred way of contact']}</p>
           <p>{post['Contact info']}</p>
-                </div>
+        </div>
         <div className="max-w-sm w-full rounded-md border flex flex-col gap-3 border-gray-400 p-3">
           <div className="flex items-center justify-between w-full gap-5">
             <h2 className="text-lg font-semibold">Frequency of Incidents</h2>
@@ -190,17 +190,14 @@ function PostDetail({ id }: { id: string }) {
         </div>
       </div>
       <div className="flex items-center w-full mt-5 gap-3">
-        <div className="rounded-md w-full p-1 border border-gray-400">
-          <iframe
-            width="100%"
-            height="360"
-            className="rounded-md border border-gray-300"
-            style={{ border: 0 }}
-            loading="lazy"
-            allowFullScreen
-            referrerPolicy="no-referrer-when-downgrade"
-            src={mapUrl}
-          ></iframe>
+        <div className="rounded-md w-full">
+          <GoogleMap
+            lat={lat}
+            lng={lng}
+            label={city || post.Location}
+            height="360px"
+            zoom={15}
+          />
         </div>
         <div className="rounded-md h-[370px] w-full p-4 border border-gray-400">
           <h1 className="text-center text-lg font-semibold mb-4">

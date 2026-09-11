@@ -23,30 +23,58 @@ import { Checkbox } from './ui/checkbox';
 
 const contactMethods = ['Phone', 'Email', 'Text message', 'In-person'];
 
-const FormSchema = z.object({
-  name: z.string().min(2, {
-    message: 'Username must be at least 2 characters.',
-  }),
-  phone: z.string().optional(),
-  location: z.object({
-    lat: z.number(),
-    lng: z.number(),
-  }),
-  occurrenceDuration: z
-    .string()
-    .min(1, { message: 'Please specify a duration.' }),
-  frequency: z.string().min(1, { message: 'Please specify a frequency.' }),
-  visibleInjuries: z.enum(['Yes', 'No']),
-  preferredContact: z
-    .array(z.enum(['Phone', 'Email', 'Text message', 'In-person']))
-    .min(1, {
-      message: 'Please select at least one contact method.',
+const FormSchema = z
+  .object({
+    name: z.string().min(2, {
+      message: 'Username must be at least 2 characters.',
     }),
-  currentSituation: z
-    .string()
-    .min(5, { message: 'Please describe the current situation.' }),
-  culprit: z.string().min(5, { message: 'Please describe the culprit.' }),
-});
+    phone: z.string().optional(),
+    email: z.string().optional(),
+    location: z.object({
+      lat: z.number(),
+      lng: z.number(),
+    }),
+    occurrenceDuration: z
+      .string()
+      .min(1, { message: 'Please specify a duration.' }),
+    frequency: z.string().min(1, { message: 'Please specify a frequency.' }),
+    visibleInjuries: z.enum(['Yes', 'No']),
+    preferredContact: z
+      .array(z.enum(['Phone', 'Email', 'Text message', 'In-person']))
+      .min(1, {
+        message: 'Please select at least one contact method.',
+      }),
+    currentSituation: z
+      .string()
+      .min(5, { message: 'Please describe the current situation.' }),
+    culprit: z.string().min(5, { message: 'Please describe the culprit.' }),
+  })
+  .refine(
+    (data) => {
+      // If 'Email' is selected as preferred contact, email must be provided
+      if (data.preferredContact.includes('Email')) {
+        return data.email && data.email.includes('@');
+      }
+      return true;
+    },
+    {
+      message: 'A valid email address is required when Email is selected as a contact method.',
+      path: ['email'],
+    }
+  )
+  .refine(
+    (data) => {
+      // If 'Phone' is selected as preferred contact, phone must be provided
+      if (data.preferredContact.includes('Phone')) {
+        return data.phone && data.phone.length >= 7;
+      }
+      return true;
+    },
+    {
+      message: 'A valid phone number is required when Phone is selected as a contact method.',
+      path: ['phone'],
+    }
+  );
 
 // interface InputFormProps {
 //   setResImage: (resImage: string) => void;
@@ -64,6 +92,7 @@ export function InputForm({
     defaultValues: {
       name: '',
       phone: '',
+      email: '',
       location: { lat: 0, lng: 0 }, // Default to zero coordinates
       occurrenceDuration: '',
       frequency: '',
@@ -187,6 +216,21 @@ export function InputForm({
                 <FormLabel>Phone</FormLabel>
                 <FormControl>
                   <Input placeholder="Your phone number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+        {selectedContactMethods.includes('Email') && (
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input placeholder="Your email address" type="email" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

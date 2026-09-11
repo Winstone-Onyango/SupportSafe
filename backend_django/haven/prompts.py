@@ -7,6 +7,7 @@ Here are the inputs:
 
 Name: [User's Name]
 Phone: [User's Phone Number]
+Email: [User's Email Address]
 Location: [User's Location lat,lng]
 How long has it been occurring?: [Duration of Abuse]
 Frequency of Incidents: [How often the incidents occur]

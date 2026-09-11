@@ -6,6 +6,7 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:800
 interface GenerateTextRequestData {
   name: string;
   phone: string;
+  email: string;
   location: { lat: number; lng: number };
   occurrenceDuration: number;
   frequency: number;
@@ -21,6 +22,7 @@ export async function POST(req: Request) {
     const updatedData = {
       name: data.name,
       phone: data.phone,
+      email: data.email,
       location: data.location,
       duration_of_abuse: data.occurrenceDuration,
       frequency_of_incidents: data.frequency,
