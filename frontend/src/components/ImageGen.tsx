@@ -90,7 +90,7 @@ export default function ImageGen({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="max-w-4xl mx-auto space-y-9 w-full"
+        className="max-w-4xl mx-auto space-y-6 sm:space-y-9 w-full px-2 sm:px-4"
       >
         <FormField
           control={form.control}
@@ -105,9 +105,9 @@ export default function ImageGen({
                       <div
                         key={index}
                         onClick={() => handleTextOptionClick(textOption)}
-                        className="cursor-pointer bg-slate-100 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 p-3 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 hover:border-slate-300 transition duration-150"
+                        className="cursor-pointer rounded-md border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 p-3 hover:bg-slate-100 dark:hover:bg-slate-600/50 transition-colors duration-150"
                       >
-                        <p className="text-sm text-slate-700 dark:text-slate-200 line-clamp-4 whitespace-pre-wrap">
+                        <p className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words max-h-40 overflow-y-auto">
                           {textOption}
                         </p>
                       </div>
@@ -139,7 +139,7 @@ export default function ImageGen({
                   {...field}
                 />
               </FormControl>
-              <div className="flex gap-2 mt-2">
+              <div className="flex flex-wrap gap-2 mt-2">
                 {promptSuggestions.map((suggestion, index) => (
                   <button
                     key={index}
@@ -169,31 +169,31 @@ export default function ImageGen({
 
       {isLoading ? (
         // Skeleton loader shown while the images are being generated
-        <div className="mt-6 space-y-4">
+        <div className="mt-6 space-y-4 px-2 sm:px-4">
           <h2 className="text-xl font-semibold">Generating Images...</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[...Array(2)].map((_, index) => (
-              <Skeleton key={index} className="h-[192px] w-full bg-gray-300" />
+              <Skeleton key={index} className="h-48 w-full bg-gray-300" />
             ))}
           </div>
         </div>
       ) : imageOptions && imageOptions.length > 0 ? (
-        <div className="mt-6 space-y-4 mb-6">
+        <div className="mt-6 space-y-4 mb-6 px-2 sm:px-4">
           <h2 className="text-xl font-semibold">Select an Image</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {imageOptions.map((imageUrl, index) => (
               <div
                 key={index}
-                className="cursor-pointer shadow hover:shadow-lg hover:scale-105 duration-200"
+                className="cursor-pointer shadow hover:shadow-lg hover:scale-[1.02] duration-200 rounded-md overflow-hidden"
                 onClick={() => handleImageSelect(imageUrl)}
               >
-                <div className="relative w-full h-48 overflow-hidden rounded-md">
+                <div className="relative w-full aspect-square">
                   <Image
                     src={imageUrl}
                     alt={`Generated Image ${index + 1}`}
-                    layout="fill"
-                    objectFit="cover" // Ensures image fills the space without distortion
-                    className="rounded-md"
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
+                    className="object-cover"
                   />
                 </div>
               </div>

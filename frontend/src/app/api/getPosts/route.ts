@@ -2,16 +2,25 @@
 import axios from 'axios';
 import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    // Replace with your FastAPI backend URL
+    // Forward the authorization header from the client if present
+    const authHeader = request.headers.get('authorization');
+    const headers: Record<string, string> = {};
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+    }
+
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/get-admin-posts`
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/get-admin-posts`,
+      { headers }
     );
 
-    // Check if the response was successful
     if (response.status === 200) {
-      return NextResponse.json(response.data, { status: 200 });
+      // The backend returns a JSON array directly; wrap it in an object
+      // so the frontend can destructure { posts: [...] } consistently
+      const posts = Array.isArray(response.data) ? response.data : [];
+      return NextResponse.json({ posts }, { status: 200 });
     } else {
       return NextResponse.json(
         { message: `Error fetching posts: ${response.statusText}` },

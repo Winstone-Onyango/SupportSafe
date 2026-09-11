@@ -51,7 +51,7 @@ export default function HorizontalLinearStepper({
   }, [activeStep, poem]);
 
   return (
-    <div className="max-w-4xl mx-auto w-full mt-6">
+    <div className="max-w-4xl mx-auto w-full px-2 sm:px-4 mt-4 sm:mt-6">
       <Stepper activeStep={activeStep}>
         {steps.map((label) => (
           <Step key={label}>

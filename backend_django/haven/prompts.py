@@ -1,3 +1,5 @@
+# Prompt template sent to the LLM to expand a victim's short form answers into a full
+# first-person report suitable for authorities.
 USER_POST_TEXT_EXPANSION_PROMPT = """
 Generate a clear, urgent, and structured report based on the following details to help authorities understand the victim's situation and take prompt action. The report should be in the first person, highlighting the severity of the situation, the frequency of the abuse, and the danger posed by the perpetrator. The narrative should be concise and emphasize the need for immediate intervention. The report should also include the preferred method of contact to ensure a fast response. Report shouldn't be in markdown format.
 
@@ -22,6 +24,8 @@ The tone should be urgent and should convey the victim’s fear, making it clear
 
 """
 
+# Prompt template used to parse a free-text paragraph from a victim into the 11 structured
+# fields that the backend later regex-extracts (see haven/utils/regex_ptr.py).
 USER_POST_TEXT_DECOMPOSITION_PROMPT = """
 You are given a paragraph written by a person experiencing domestic abuse. Carefully analyze the paragraph and extract the following structured information. Please respond in the exact format provided below for consistency.
 
@@ -63,6 +67,8 @@ Include any other relevant information that provides additional context.
 Note: Use "Not specified" if a detail is missing from the text.
 """
 
+# Prompt template for the short supportive poem shown to victims after they submit a report.
 INSPIRATION_POEM_PROMPT = """
 Write a short, empowering poem (around 50 words) to inspire anyone facing abusive relationships, regardless of gender. Convey strength, resilience, and hope, and gently remind them that through Platform X, help is on the way and they are not alone. The tone should be compassionate, uplifting, and encouraging, providing a sense of comfort and support. The poem should be rhyming
 """
+

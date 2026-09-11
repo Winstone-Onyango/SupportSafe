@@ -1,7 +1,6 @@
 .vscode
 .venv
 .env
-bin/
 
 google-api.json
 frontend/.env.local

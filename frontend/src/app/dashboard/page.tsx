@@ -58,7 +58,7 @@ function Page() {
   }
 
   return (
-    <div className=" flex flex-col justify-center mx-auto max-w-5xl w-full p-4">
+    <div className="flex flex-col justify-center mx-auto max-w-6xl w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       <LiveTitleNoSSR />
       {/* Twitter hashtag reports (renders nothing while the X API is unavailable) */}
       <RealtimeList />
