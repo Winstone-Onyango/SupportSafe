@@ -1,13 +1,21 @@
 'use client';
 
+// React namespace (useState)
 import * as React from 'react';
+// Next.js router for programmatic navigation
 import { useRouter } from 'next/navigation';
+// react-hook-form for form state management
 import { useForm } from 'react-hook-form';
+// Zod for schema validation
 import { z } from 'zod';
+// Zod resolver for react-hook-form
 import { zodResolver } from '@hookform/resolvers/zod';
+// Toast notifications
 import toast from 'react-hot-toast';
 
+// shadcn/ui button
 import { Button } from '@/components/ui/button';
+// shadcn/ui form parts
 import {
   Form,
   FormControl,
@@ -16,21 +24,29 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+// shadcn/ui input
 import { Input } from '@/components/ui/input';
+// Auth helper: sign in via the backend proxy
 import { login } from '@/lib/auth';
+// User and lock icons for the input fields
 import { Lock, User } from 'lucide-react';
 
+// Validation schema: both fields must be non-empty
 const SignInSchema = z.object({
   username: z.string().min(1, 'Please enter your username'),
   password: z.string().min(1, 'Please enter your password'),
 });
 
+// TypeScript type inferred from the schema
 type SignInFormValues = z.infer<typeof SignInSchema>;
 
+// Admin sign-in form. On success the user is redirected to the dashboard.
 export default function SignInForm() {
   const router = useRouter();
+  // Whether a sign-in request is in progress
   const [loading, setLoading] = React.useState(false);
 
+  // Set up react-hook-form with Zod validation
   const form = useForm<SignInFormValues>({
     resolver: zodResolver(SignInSchema),
     defaultValues: {
@@ -39,13 +55,16 @@ export default function SignInForm() {
     },
   });
 
+  // Handle form submission: sign in and redirect to the dashboard
   const handleSubmit = async (data: SignInFormValues) => {
     setLoading(true);
     try {
+      // Call the login helper (posts to /api/auth/login)
       await login(data.username, data.password);
       toast.success('Signed in successfully');
       router.push('/dashboard');
     } catch (error) {
+      // Show the backend's error message (or a generic fallback)
       toast.error(error instanceof Error ? error.message : 'Login failed');
     } finally {
       setLoading(false);
@@ -53,9 +72,12 @@ export default function SignInForm() {
   };
 
   return (
+    // Full-screen centered layout with a gradient background
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4">
       <div className="w-full max-w-md">
+        {/* Card container */}
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8">
+          {/* Heading */}
           <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-gray-100 mb-2">
             Admin Sign In
           </h1>
@@ -68,6 +90,7 @@ export default function SignInForm() {
               onSubmit={form.handleSubmit(handleSubmit)}
               className="space-y-6"
             >
+              {/* Username field with a user icon */}
               <FormField
                 control={form.control}
                 name="username"
@@ -92,6 +115,7 @@ export default function SignInForm() {
                 )}
               />
 
+              {/* Password field with a lock icon */}
               <FormField
                 control={form.control}
                 name="password"
@@ -116,6 +140,7 @@ export default function SignInForm() {
                 )}
               />
 
+              {/* Submit button */}
               <Button
                 type="submit"
                 disabled={loading}
@@ -127,6 +152,7 @@ export default function SignInForm() {
           </Form>
         </div>
 
+        {/* Footer note clarifying this is admin-only */}
         <p className="text-center text-sm text-gray-600 dark:text-gray-300 mt-6">
           For admin access only — no registration required.
         </p>

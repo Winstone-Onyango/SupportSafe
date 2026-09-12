@@ -1,4 +1,6 @@
+// React namespace
 import * as React from 'react';
+// Material UI Lab: Timeline components
 import Timeline from '@mui/lab/Timeline';
 import TimelineItem from '@mui/lab/TimelineItem';
 import TimelineSeparator from '@mui/lab/TimelineSeparator';
@@ -6,13 +8,18 @@ import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
 import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
 import TimelineDot from '@mui/lab/TimelineDot';
+// Material UI icons for each timeline stage
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+// Material UI Typography for text styling
 import Typography from '@mui/material/Typography';
 
+// A static three-stage timeline showing the lifecycle of a report:
+// Issue Created → Location Visited → Issue Completed.
 export default function CustomTimeline() {
   return (
+    // Alternating left/right layout
     <Timeline position="alternate">
       {/* Stage 1: User Created Issue */}
       <TimelineItem>
@@ -26,6 +33,7 @@ export default function CustomTimeline() {
         </TimelineOppositeContent>
         <TimelineSeparator>
           <TimelineConnector />
+          {/* Primary-colored dot with a calendar icon */}
           <TimelineDot color="primary">
             <EventAvailableIcon />
           </TimelineDot>
@@ -58,6 +66,7 @@ export default function CustomTimeline() {
         </TimelineOppositeContent>
         <TimelineSeparator>
           <TimelineConnector />
+          {/* Secondary-colored dot with a location pin icon */}
           <TimelineDot color="secondary">
             <LocationOnIcon />
           </TimelineDot>
@@ -83,6 +92,7 @@ export default function CustomTimeline() {
       <TimelineItem>
         <TimelineSeparator>
           <TimelineConnector />
+          {/* Success-colored dot with a check-circle icon */}
           <TimelineDot color="success">
             <CheckCircleIcon />
           </TimelineDot>

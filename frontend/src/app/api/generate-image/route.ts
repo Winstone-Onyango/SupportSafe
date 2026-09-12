@@ -1,17 +1,23 @@
+// Next.js server utilities
 import { NextResponse } from 'next/server';
+// HTTP client for proxying to the backend
 import axios from 'axios';
 
+// Shape of the request body: the generated text and the image prompt
 interface GenerateImageRequestData {
   generatedText: string;
   imagePrompt: string;
 }
 
+// POST /api/generate-image — proxies image generation to the backend.
+// The browser sends the prompt; the backend calls the image-generation model.
 export async function POST(req: Request) {
   try {
+    // Parse the request body
     const data: GenerateImageRequestData = await req.json();
     console.log('Received data:', data);
 
-    // Mocking the image generation API response with multiple images
+    // Forward the prompt to the backend's image-generation endpoint
     const res = await axios.post(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/generate-image`,
       { prompt: data.imagePrompt }
@@ -26,11 +32,15 @@ export async function POST(req: Request) {
     //   },
     // };
     // console.log('Image Generation /api/generate-image:', res.data);
+    // Extract the array of generated image URLs
     const imageUrls = res.data.image_urls; // Array of image URLs
+    // Return the URLs so the user can pick one
     return NextResponse.json({ images: imageUrls }, { status: 200 });
   } catch (error: unknown) {
+    // Log for server-side debugging
     console.error('Image generation failed:', error);
     let detail = 'Failed to generate images';
+    // Surface the backend's own error message when available
     if (axios.isAxiosError(error)) {
       const backendDetail = error.response?.data?.detail;
       if (typeof backendDetail === 'string') detail = backendDetail;

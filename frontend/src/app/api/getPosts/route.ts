@@ -1,7 +1,11 @@
 // app/api/posts/route.js
+// HTTP client for proxying to the backend
 import axios from 'axios';
+// Next.js server utilities
 import { NextResponse } from 'next/server';
 
+// GET /api/getPosts — fetches all admin-visible posts from the backend.
+// The optional Authorization header is forwarded so the backend can verify the session.
 export async function GET(request: Request) {
   try {
     // Forward the authorization header from the client if present
@@ -11,6 +15,7 @@ export async function GET(request: Request) {
       headers['Authorization'] = authHeader;
     }
 
+    // Ask the backend for all admin-visible posts
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/get-admin-posts`,
       { headers }
@@ -22,12 +27,14 @@ export async function GET(request: Request) {
       const posts = Array.isArray(response.data) ? response.data : [];
       return NextResponse.json({ posts }, { status: 200 });
     } else {
+      // Non-200 responses carry a status text for debugging
       return NextResponse.json(
         { message: `Error fetching posts: ${response.statusText}` },
         { status: response.status }
       );
     }
   } catch (error) {
+    // Extract a human-readable message from the error
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
