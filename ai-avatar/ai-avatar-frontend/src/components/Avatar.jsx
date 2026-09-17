@@ -92,16 +92,20 @@ const facialExpressions = {
   },
 };
 
+// Rhubarb's phonetic mouth shapes (A-H, X) mapped onto the viseme blendshapes
+// that exist in the avatar model. The names here must match the entries in
+// public/models/6732180e5415f67e067badca.glb exactly (note: the open-mouth
+// viseme is lowercase "viseme_aa").
 const corresponding = {
   A: 'viseme_PP',
   B: 'viseme_kk',
   C: 'viseme_I',
-  D: 'viseme_AA',
+  D: 'viseme_aa',
   E: 'viseme_O',
   F: 'viseme_U',
   G: 'viseme_FF',
   H: 'viseme_TH',
-  X: 'viseme_PP',
+  X: 'viseme_sil',
 };
 
 let setupMode = false;
@@ -114,22 +118,64 @@ export function Avatar(props) {
   const { message, onMessagePlayed, chat } = useChat();
 
   const [lipsync, setLipsync] = useState();
+  const audioRef = useRef();
 
   useEffect(() => {
-    console.log(message);
+    // Stop any audio that is still playing from the previous message.
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.onended = null;
+      audioRef.current = null;
+    }
+
     if (!message) {
       setAnimation('Idle');
+      setLipsync(undefined);
       return;
     }
-    setAnimation(message.animation);
-    setFacialExpression(message.facialExpression);
-    setLipsync(message.lipsync);
-    if (message.audio) {
-      const audio = new Audio('data:audio/mp3;base64,' + message.audio);
-      audio.play().catch((e) => console.warn('Audio playback failed:', e));
+
+    setLipsync(message.lipsync?.mouthCues ? message.lipsync : undefined);
+    setAnimation(message.animation || 'Idle');
+    setFacialExpression(message.facialExpression || '');
+
+    if (!message.audio) {
+      // No voice for this message (e.g. ElevenLabs not configured) - advance the
+      // queue instead of hanging on a reply that will never "finish speaking".
+      const timer = setTimeout(() => onMessagePlayed(), 2500);
+      return () => clearTimeout(timer);
     }
-    setAudio(audio);
-    audio.onended = onMessagePlayed;
+
+    const audio = new Audio('data:audio/mpeg;base64,' + message.audio);
+    audioRef.current = audio;
+
+    // Only ever advance the queue once for this message, even if `ended`,
+    // `error` and the play() rejection somehow all fire.
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      onMessagePlayed();
+    };
+
+    // `onended` must be attached BEFORE play() so a cached/short clip that ends
+    // immediately still advances the queue.
+    audio.onended = finish;
+    audio.onerror = () => {
+      console.warn('Audio playback failed for this message.');
+      finish();
+    };
+    audio.play().catch((e) => {
+      console.warn('Audio playback failed:', e);
+      finish();
+    });
+
+    return () => {
+      audio.pause();
+      audio.onended = null;
+      if (audioRef.current === audio) {
+        audioRef.current = null;
+      }
+    };
   }, [message]);
 
   const { animations } = useGLTF('/models/animations.glb');
@@ -140,11 +186,13 @@ export function Avatar(props) {
     animations.find((a) => a.name === 'Idle') ? 'Idle' : animations[0].name // Check if Idle animation exists otherwise use first animation
   );
   useEffect(() => {
-    actions[animation]
+    const action = actions[animation] || actions[animations[0]?.name];
+    if (!action) return;
+    action
       .reset()
       .fadeIn(mixer.stats.actions.inUse === 0 ? 0 : 0.5)
       .play();
-    return () => actions[animation].fadeOut(0.5);
+    return () => action.fadeOut(0.5);
   }, [animation]);
 
   const lerpMorphTarget = (target, value, speed = 0.1) => {
@@ -178,7 +226,6 @@ export function Avatar(props) {
   const [winkLeft, setWinkLeft] = useState(false);
   const [winkRight, setWinkRight] = useState(false);
   const [facialExpression, setFacialExpression] = useState('');
-  const [audio, setAudio] = useState();
 
   useFrame(() => {
     !setupMode &&
@@ -203,8 +250,9 @@ export function Avatar(props) {
     }
 
     const appliedMorphTargets = [];
-    if (message && lipsync) {
-      const currentAudioTime = audio.currentTime;
+    const activeAudio = audioRef.current;
+    if (lipsync?.mouthCues?.length && activeAudio && !activeAudio.ended) {
+      const currentAudioTime = activeAudio.currentTime;
       for (let i = 0; i < lipsync.mouthCues.length; i++) {
         const mouthCue = lipsync.mouthCues[i];
         if (
@@ -376,5 +424,5 @@ export function Avatar(props) {
   );
 }
 
-useGLTF.preload('/models/64f1a714fe61576b46f27ca2.glb');
+useGLTF.preload('/models/6732180e5415f67e067badca.glb');
 useGLTF.preload('/models/animations.glb');

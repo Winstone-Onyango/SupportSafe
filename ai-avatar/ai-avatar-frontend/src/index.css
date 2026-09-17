@@ -14,11 +14,20 @@
 
 body {
   margin: 0;
-  background-color: #ffcc7e;
-  background-image: linear-gradient(19deg, #ffcc7e 0%, #ddd6f3 100%);
+  font-family: 'Inter', system-ui, sans-serif;
+  /* SupportSafe palette: calm blues rather than the old warm gradient. */
+  background-color: #eff6ff;
+  background-image: linear-gradient(160deg, #eff6ff 0%, #e0e7ff 45%, #cffafe 100%);
 }
 
 body.greenScreen {
   background-color: #00ff00;
+  background-image: none;
+}
+
+/* When embedded inside the SupportSafe Next.js page the surrounding chrome is
+   provided by the host, so we make the canvas blend into the page. */
+body.embedded {
+  background-color: transparent;
   background-image: none;
 }

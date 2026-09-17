@@ -1,94 +1,132 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useChat } from '../hooks/useChat';
+
+// Small helper that resolves the status pill shown in the header.
+const useStatusLabel = () => {
+  const { loading, speaking, message } = useChat();
+  if (loading) return { label: 'Thinking', tone: 'thinking' };
+  if (speaking) return { label: 'Speaking', tone: 'speaking' };
+  if (message) return { label: 'Ready', tone: 'ready' };
+  return { label: 'Ready to listen', tone: 'ready' };
+};
+
+// Colored dot + label describing what the companion is currently doing.
+const StatusPill = () => {
+  const { label, tone } = useStatusLabel();
+  const dot =
+    tone === 'speaking'
+      ? 'bg-emerald-500 animate-pulse'
+      : tone === 'thinking'
+        ? 'bg-amber-500 animate-pulse'
+        : 'bg-blue-500';
+
+  return (
+    <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-slate-700 backdrop-blur">
+      <span className={`h-2 w-2 rounded-full ${dot}`} />
+      {label}
+    </span>
+  );
+};
+
+// Readable transcript so the conversation is never lost when the voice ends.
+const Transcript = () => {
+  const { transcript, loading } = useChat();
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    const node = scrollRef.current;
+    if (node) {
+      node.scrollTop = node.scrollHeight;
+    }
+  }, [transcript, loading]);
+
+  return (
+    <div className="pointer-events-auto flex max-h-[45vh] w-full max-w-sm flex-col overflow-hidden rounded-2xl border border-white/60 bg-white/75 shadow-lg backdrop-blur-md">
+      <div className="border-b border-slate-200/70 px-4 py-2 text-xs font-bold uppercase tracking-wide text-slate-500">
+        Conversation
+      </div>
+      <div ref={scrollRef} className="flex flex-col gap-2 overflow-y-auto px-3 py-3">
+        {transcript.length === 0 && (
+          <p className="px-1 py-2 text-sm italic text-slate-500">
+            Share what you are going through. I am here, and this is a safe space.
+          </p>
+        )}
+        {transcript.map((entry) => (
+          <div
+            key={entry.id}
+            className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed ${
+              entry.role === 'user'
+                ? 'self-end bg-blue-600 text-white'
+                : 'self-start bg-white text-slate-800 shadow-sm'
+            }`}
+          >
+            {entry.text}
+          </div>
+        ))}
+        {loading && (
+          <div className="self-start rounded-2xl bg-white px-3 py-2 text-sm text-slate-400 shadow-sm">
+            <span className="animate-pulse">...</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export const UI = ({ hidden, ...props }) => {
   const input = useRef();
-  const { chat, loading, cameraZoomed, setCameraZoomed, message } = useChat();
+  const { chat, loading, message, cameraZoomed, setCameraZoomed } = useChat();
 
   const sendMessage = () => {
-    const text = input.current.value;
-    if (!loading && !message) {
-      chat(text);
-      input.current.value = '';
-    }
+    const text = input.current?.value?.trim();
+    if (!text) return;
+    chat(text);
+    input.current.value = '';
+    input.current.focus();
   };
+
   if (hidden) {
     return null;
   }
 
+  // The field stays usable while the avatar speaks so you can keep the
+  // conversation going; audio simply queues up behind the current reply.
+  const busy = loading && !message;
+
   return (
-    <>
-      <div className="fixed top-0 left-0 right-0 bottom-0 z-10 flex justify-between p-4 flex-col pointer-events-none">
-        <div className="self-start backdrop-blur-md bg-white bg-opacity-50 p-4 rounded-lg">
-          <h1 className="font-black text-xl">My Therapy Assistant</h1>
-          <p>I will heal you ❤️</p>
+    <div className="pointer-events-none fixed inset-0 z-10 flex flex-col justify-between p-4">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="rounded-2xl border border-white/60 bg-white/75 p-4 shadow-lg backdrop-blur-md">
+          <h1 className="text-xl font-black leading-tight text-slate-900">
+            Support<span className="text-indigo-700">Safe</span> Companion
+          </h1>
+          <p className="text-sm text-slate-600">
+            A private, judgement-free space to talk.
+          </p>
+          <div className="mt-2">
+            <StatusPill />
+          </div>
         </div>
-        <div className="w-full flex flex-col items-end justify-center gap-4">
-          <button
-            onClick={() => setCameraZoomed(!cameraZoomed)}
-            className="pointer-events-auto bg-[#ffcc7e] hover:bg-[#fda625] text-black p-4 rounded-md"
-          >
-            {cameraZoomed ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM13.5 10.5h-6"
-                />
-              </svg>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6"
-                />
-              </svg>
-            )}
-          </button>
-          <button
-            onClick={() => {
-              const body = document.querySelector('body');
-              if (body.classList.contains('greenScreen')) {
-                body.classList.remove('greenScreen');
-              } else {
-                body.classList.add('greenScreen');
-              }
-            }}
-            className="pointer-events-auto bg-[#ffcc7e] hover:bg-[#fda625] text-black p-4 rounded-md"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z"
-              />
-            </svg>
-          </button>
+
+        <div className="flex flex-col gap-2">
+          <Transcript />
         </div>
-        <div className="flex items-center gap-2 pointer-events-auto max-w-screen-sm w-full mx-auto">
+      </div>
+
+      {/* Bottom controls */}
+      <div className="flex flex-col items-center gap-3">
+        <button
+          type="button"
+          onClick={() => setCameraZoomed(!cameraZoomed)}
+          className="pointer-events-auto rounded-full bg-white/75 px-4 py-2 text-xs font-semibold text-slate-700 shadow backdrop-blur-md transition hover:bg-white"
+        >
+          {cameraZoomed ? 'Zoom out' : 'Zoom in'}
+        </button>
+
+        <div className="pointer-events-auto flex w-full max-w-screen-sm items-center gap-2">
           <input
-            className="w-full placeholder:text-gray-800 placeholder:italic p-4 rounded-md bg-opacity-50 bg-white backdrop-blur-md"
+            className="w-full rounded-xl border border-white/60 bg-white/80 p-4 text-slate-800 placeholder:italic placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/60"
             placeholder="Type a message..."
             ref={input}
             onKeyDown={(e) => {
@@ -98,16 +136,17 @@ export const UI = ({ hidden, ...props }) => {
             }}
           />
           <button
-            disabled={loading || message}
+            type="button"
+            disabled={busy}
             onClick={sendMessage}
-            className={`bg-[#ffcc7e] hover:bg-[#fda625] text-black p-4 px-10 font-semibold uppercase rounded-md ${
-              loading || message ? 'cursor-not-allowed opacity-30' : ''
+            className={`rounded-xl bg-blue-600 px-8 py-4 font-semibold uppercase text-white shadow-lg transition hover:bg-blue-700 ${
+              busy ? 'cursor-not-allowed opacity-40' : ''
             }`}
           >
             Send
           </button>
         </div>
       </div>
-    </>
+    </div>
   );
 };

@@ -65,11 +65,8 @@ function NavContent({ pathname }: { pathname: string }) {
           <Link href="/lawbot" className={linkClass('/lawbot')}>
             Law Bot
           </Link>
-          {/* Therapy Bot links out to a separate deployment */}
-          <Link
-            href="https://support-safe.vercel.app/"
-            className={linkClass('/therapybot')}
-          >
+          {/* Therapy Bot — the 3D AI companion (runs inside SupportSafe) */}
+          <Link href="/therapybot" className={linkClass('/therapybot')}>
             Therapy Bot
           </Link>
         </>
