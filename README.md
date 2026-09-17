@@ -99,7 +99,8 @@ Due to severe social stigma, many survivors never seek traditional therapy. Our 
 - **Instant Grounding Techniques:** Interactive guidance on deep breathing, calming exercises, and cognitive refocusing during acute distress.
 - **Trauma-Informed Responses:** Carefully tuned conversational paths that offer validation, reduce guilt, and foster emotional safety.
 - **No Judgment:** Available 24/7, it never judges, breaks confidentiality, or carries bias.
-![alt text](<AI Support companion.png>) 
+<img width="1917" height="907" alt="Screenshot 2026-09-17 184130" src="https://github.com/user-attachments/assets/08f7aedb-2df8-45ca-b52a-84c14e2c2770" />
+
 ---
 
 ## 🏗 System Architecture
