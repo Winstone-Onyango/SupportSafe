@@ -15,11 +15,12 @@ export default function SignUpPage() {
   const router = useRouter();
 
   return (
-    // Full-screen centered layout with a gradient background
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4">
+    // Full-height centered layout with a gradient background (see sign-in for
+    // why `min-h-full` is used instead of min-h-screen)
+    <div className="min-h-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4 sm:p-6">
       <div className="w-full max-w-md">
         {/* Card container */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 text-center">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-6 sm:p-8 text-center">
           {/* Lock icon illustration */}
           <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
             <LockIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" />

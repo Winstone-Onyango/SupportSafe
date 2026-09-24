@@ -5,9 +5,9 @@ import React from 'react';
 // Route-level fallback shown while a page segment is being fetched
 function loading() {
   return (
-    // Centered spinner, nudged up so it appears centred under the navbar
-    <div className="h-screen flex items-center justify-center">
-      <Loader2 size={24} className="animate-spin -mt-[80px]" />
+    // Centered spinner that fills whatever space the page has
+    <div className="flex h-full min-h-[60vh] items-center justify-center">
+      <Loader2 size={24} className="animate-spin" />
     </div>
   );
 }

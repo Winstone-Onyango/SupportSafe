@@ -72,16 +72,18 @@ export default function SignInForm() {
   };
 
   return (
-    // Full-screen centered layout with a gradient background
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4">
+    // Full-height centered layout with a gradient background. `min-h-full`
+    // (instead of min-h-screen) keeps it inside the shared navbar shell, so a
+    // phone never gets an extra empty scroll area.
+    <div className="min-h-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4 sm:p-6">
       <div className="w-full max-w-md">
         {/* Card container */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-5 sm:p-8">
           {/* Heading */}
-          <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-gray-100 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 dark:text-gray-100 mb-2">
             Admin Sign In
           </h1>
-          <p className="text-center text-gray-600 dark:text-gray-300 mb-8">
+          <p className="text-center text-gray-600 dark:text-gray-300 mb-6 sm:mb-8">
             Enter your credentials to access the admin dashboard
           </p>
 

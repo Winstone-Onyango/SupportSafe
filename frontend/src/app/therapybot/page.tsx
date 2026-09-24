@@ -118,9 +118,9 @@ function TherapyBotContent() {
   return (
     <div className="flex flex-1 min-h-0 flex-col">
       {/* Header: title, dependency status and actions */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b bg-white/80 px-4 py-3 backdrop-blur dark:bg-slate-900/80">
-        <div>
-          <h1 className="text-lg font-bold text-blue-700 dark:text-blue-400">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b bg-white/80 px-3 py-2.5 backdrop-blur dark:bg-slate-900/80 sm:gap-3 sm:px-4 sm:py-3">
+        <div className="min-w-0">
+          <h1 className="text-base font-bold text-blue-700 dark:text-blue-400 sm:text-lg">
             AI Companion
           </h1>
           <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -129,6 +129,7 @@ function TherapyBotContent() {
           </p>
         </div>
 
+        {/* Status chips + actions wrap onto their own line on a phone */}
         <div className="flex flex-wrap items-center gap-2">
           <StatusChip label="Avatar engine" status={avatarApp} />
           <StatusChip label="Voice + AI" status={backend} />
@@ -136,7 +137,7 @@ function TherapyBotContent() {
           <button
             type="button"
             onClick={retry}
-            className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-200 dark:hover:bg-slate-700"
+            className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 active:bg-gray-100 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-200 dark:hover:bg-slate-700 dark:active:bg-slate-600"
           >
             <RefreshCw size={14} />
             Retry
@@ -147,7 +148,7 @@ function TherapyBotContent() {
             href={AVATAR_APP_URL}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-200 dark:hover:bg-slate-700"
+            className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 active:bg-gray-100 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-200 dark:hover:bg-slate-700 dark:active:bg-slate-600"
           >
             <ExternalLink size={14} />
             Open full screen
@@ -163,8 +164,8 @@ function TherapyBotContent() {
             <p className="text-sm font-medium">Connecting to your companion...</p>
           </div>
         ) : avatarApp === 'offline' ? (
-          <div className="flex h-full items-center justify-center p-6">
-            <div className="max-w-xl rounded-2xl border border-amber-200 bg-white/90 p-6 shadow-lg dark:border-slate-700 dark:bg-slate-800/90">
+          <div className="flex h-full items-center justify-center p-3 sm:p-6">
+            <div className="max-w-xl rounded-2xl border border-amber-200 bg-white/90 p-4 shadow-lg dark:border-slate-700 dark:bg-slate-800/90 sm:p-6">
               <div className="flex items-start gap-3">
                 <AlertTriangle className="mt-0.5 shrink-0 text-amber-500" />
                 <div className="space-y-3 text-sm text-gray-700 dark:text-gray-200">
@@ -178,7 +179,7 @@ function TherapyBotContent() {
                     </code>
                     , so it runs as a small separate service. Start it with:
                   </p>
-                  <pre className="overflow-x-auto rounded-lg bg-slate-900 p-3 text-xs text-slate-100">
+                  <pre className="overflow-x-auto rounded-lg bg-slate-900 p-3 text-[11px] text-slate-100 sm:text-xs">
 {`cd ai-avatar/ai-avatar-backend
 node index.js
 
@@ -217,8 +218,8 @@ npm run dev`}
               className="h-full w-full border-0"
             />
             {backend === 'offline' && (
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center p-3">
-                <p className="rounded-full bg-rose-600/95 px-4 py-2 text-xs font-semibold text-white shadow-lg">
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center p-2 sm:p-3">
+                <p className="max-w-[92%] rounded-2xl bg-rose-600/95 px-4 py-2 text-center text-xs font-semibold text-white shadow-lg">
                   Voice and AI replies are offline - start the avatar backend on
                   port 3001.
                 </p>

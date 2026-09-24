@@ -76,8 +76,8 @@ function RealtimeList() {
 
   if (loading) {
     return (
-      <div className="space-y-4 mt-4">
-        <h2 className="text-xl font-semibold">
+      <div className="mt-4 space-y-4">
+        <h2 className="text-lg font-semibold sm:text-xl">
           Live Reports — #{REPORT_HASHTAG}
         </h2>
         {[...Array(3)].map((_, i) => (
@@ -88,15 +88,20 @@ function RealtimeList() {
   }
 
   return (
-    <div className="space-y-4 mt-4 w-full">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">
+    <div className="mt-4 w-full space-y-4">
+      {/* Header wraps so the Refresh button never squeezes the title on a phone */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-lg font-semibold sm:text-xl">
           Live Reports —{' '}
           <span className="text-blue-700 dark:text-blue-300">
             #{REPORT_HASHTAG}
           </span>
         </h2>
-        <Button variant="outline" onClick={load} className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          onClick={load}
+          className="flex shrink-0 items-center gap-2"
+        >
           <RefreshCw size={16} />
           Refresh
         </Button>
@@ -133,9 +138,9 @@ function RealtimeList() {
         {(reports ?? []).map((report) => (
           <div
             key={report.tweet_id}
-            className="rounded-xl border shadow-sm bg-white dark:bg-slate-800 dark:border-slate-700 p-4 flex flex-col sm:flex-row gap-4"
+            className="flex flex-col gap-4 rounded-xl border bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-800 sm:flex-row sm:p-4"
           >
-            <div className="sm:w-40 sm:h-40 w-full h-40 relative rounded-lg overflow-hidden bg-gray-100 dark:bg-slate-700 shrink-0">
+            <div className="relative h-40 w-full shrink-0 overflow-hidden rounded-lg bg-gray-100 dark:bg-slate-700 sm:h-40 sm:w-40">
               {report.image_url ? (
                 <Image
                   src={report.image_url}

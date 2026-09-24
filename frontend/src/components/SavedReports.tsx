@@ -281,7 +281,7 @@ function SavedReports() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Saved Reports</h2>
+        <h2 className="text-lg font-semibold sm:text-xl">Saved Reports</h2>
         {[...Array(3)].map((_, i) => (
           <Skeleton key={i} className="h-32 w-full bg-gray-300" />
         ))}
@@ -291,12 +291,17 @@ function SavedReports() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">
+      {/* Header wraps so the Refresh button never squeezes the title on a phone */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-lg font-semibold sm:text-xl">
           Saved Reports -{' '}
           <span className="text-red-600 dark:text-red-400">{reports?.length ?? 0}</span> total
         </h2>
-        <Button variant="outline" onClick={load} className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          onClick={load}
+          className="flex shrink-0 items-center gap-2"
+        >
           <RefreshCw size={16} />
           Refresh
         </Button>
@@ -343,8 +348,8 @@ function ReportCard({
   const hasCoords = geo && geo.lat !== undefined && geo.lng !== undefined;
 
   return (
-    <div className="rounded-xl border shadow-sm bg-white dark:bg-slate-800 dark:border-slate-700 overflow-hidden">
-      <div className="p-4">
+    <div className="overflow-hidden rounded-xl border bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
+      <div className="p-3 sm:p-4">
         {/* Header row with name, badges, and date */}
         <div className="flex flex-wrap items-center gap-2 mb-3">
           <span className="font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
@@ -436,7 +441,7 @@ function ReportCard({
 
       {/* Full details (expanded) */}
       {expanded && (
-        <div className="border-t border-gray-200 dark:border-slate-600 p-4 bg-gray-50 dark:bg-slate-900/50 space-y-3">
+        <div className="space-y-3 border-t border-gray-200 bg-gray-50 p-3 dark:border-slate-600 dark:bg-slate-900/50 sm:p-4">
           {report.severity && (
             <DetailRow
               icon={<PersonStanding size={15} />}

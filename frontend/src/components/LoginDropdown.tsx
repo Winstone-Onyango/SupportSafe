@@ -39,7 +39,10 @@ export function LoginDropdown() {
   if (!user) {
     return (
       <Link href="/sign-in">
-        <Button variant="outline">Sign In</Button>
+        {/* Slightly tighter on phones so the header row never wraps */}
+        <Button variant="outline" className="px-3 sm:px-4">
+          Sign In
+        </Button>
       </Link>
     );
   }
@@ -47,13 +50,17 @@ export function LoginDropdown() {
   // When a user is signed in, render a dropdown with their info and actions
   return (
     <DropdownMenu>
-      {/* The trigger shows the user's name (or email) */}
+      {/* The trigger shows the user's name (or email), truncated on phones */}
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">
-          {user.name || user.email}
+        <Button variant="outline" className="max-w-[8.5rem] px-3 sm:max-w-none sm:px-4">
+          <span className="truncate">{user.name || user.email}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      {/* Menu is capped to the viewport width so it never sticks out on phones */}
+      <DropdownMenuContent
+        align="end"
+        className="w-56 max-w-[calc(100vw-2rem)]"
+      >
         {/* Header row: the user's email */}
         <DropdownMenuLabel>{user.email}</DropdownMenuLabel>
         <DropdownMenuSeparator />

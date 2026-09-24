@@ -8,8 +8,13 @@
 }
 
 #root {
-  width: 100vw;
+  width: 100%;
   height: 100vh;
+  /* Dynamic viewport height fills a phone screen even with browser chrome.
+     The plain 100vh above stays as a fallback for older browsers. */
+  height: 100dvh;
+  /* The companion is a single full-screen scene: never scroll sideways */
+  overflow: hidden;
 }
 
 body {
@@ -18,6 +23,11 @@ body {
   /* SupportSafe palette: calm blues rather than the old warm gradient. */
   background-color: #eff6ff;
   background-image: linear-gradient(160deg, #eff6ff 0%, #e0e7ff 45%, #cffafe 100%);
+  /* Stop iOS from inflating text and flashing grey on tap */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
 }
 
 body.greenScreen {

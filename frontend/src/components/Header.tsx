@@ -28,8 +28,10 @@ function Header() {
   }, []);
 
   return (
-    // Hero section: full viewport height (minus navbar), centered content
-    <section className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center overflow-hidden py-12 sm:py-16 lg:py-20">
+    // Hero section: full screen height (minus navbar), centered content.
+    // `hero-viewport` uses 100dvh where supported so phones show the whole
+    // hero instead of cropping it behind the address bar.
+    <section className="relative hero-viewport flex items-center justify-center overflow-hidden py-10 sm:py-16 lg:py-20">
       {/* Gradient background that blends into the banner */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900" />
 
@@ -75,7 +77,7 @@ function Header() {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 justify-center lg:justify-start">
               {/* Admins go straight to the dashboard */}
               {user?.role === 'admin' ? (
-                <Link href="/dashboard">
+                <Link href="/dashboard" className="w-full sm:w-auto">
                   <button className="w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-lg font-semibold text-white rounded-xl border-2 border-blue-700 bg-blue-700 dark:border-blue-300 dark:bg-blue-300 dark:text-slate-800 shadow-md transform hover:scale-105 hover:bg-blue-800 hover:text-white dark:hover:bg-blue-200 transition-all duration-200 ease-in-out flex items-center justify-center gap-2">
                     Go to Dashboard
                   </button>
@@ -83,14 +85,14 @@ function Header() {
               ) : (
                 <>
                   {/* Primary action for all users: file a report */}
-                  <Link href="/create-post">
+                  <Link href="/create-post" className="w-full sm:w-auto">
                     <button className="w-full sm:w-auto px-6 sm:px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-base sm:text-lg font-semibold text-white rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 ease-in-out flex items-center justify-center gap-2">
                       Report Now
                     </button>
                   </Link>
                   {/* Secondary action for signed-out users only: sign in */}
                   {!user && (
-                    <Link href="/sign-in">
+                    <Link href="/sign-in" className="w-full sm:w-auto">
                       <button className="w-full sm:w-auto px-6 sm:px-8 py-3 text-base sm:text-lg font-semibold text-blue-700 dark:text-blue-300 rounded-xl border-2 border-blue-700 dark:border-blue-300 shadow-md transform hover:scale-105 hover:bg-blue-700 hover:text-white dark:hover:bg-blue-300 dark:hover:text-slate-800 transition-all duration-200 ease-in-out flex items-center justify-center gap-2">
                         Sign In
                       </button>

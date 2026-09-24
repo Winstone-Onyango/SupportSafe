@@ -19,8 +19,23 @@ import Typography from '@mui/material/Typography';
 // Issue Created → Location Visited → Issue Completed.
 export default function CustomTimeline() {
   return (
-    // Alternating left/right layout
-    <Timeline position="alternate">
+    // Alternating left/right layout, collapsed to a single column on phones
+    <Timeline
+      position="alternate"
+      sx={{
+        // Below 640px the two-column (alternating) layout squeezes every event
+        // into half the screen. On phones we drop the left time column and give
+        // the events the full width (the times move into each event block).
+        '@media (max-width: 639px)': {
+          '& .MuiTimelineOppositeContent-root': { display: 'none' },
+          '& .MuiTimelineItem-root:before, & .MuiTimelineItem-root:after': {
+            flex: 0,
+            padding: 0,
+          },
+          '& .MuiTimelineContent-root': { textAlign: 'left' },
+        },
+      }}
+    >
       {/* Stage 1: User Created Issue */}
       <TimelineItem>
         <TimelineOppositeContent
@@ -39,7 +54,16 @@ export default function CustomTimeline() {
           </TimelineDot>
           <TimelineConnector />
         </TimelineSeparator>
-        <TimelineContent sx={{ py: '12px', px: 2 }}>
+        <TimelineContent sx={{ py: '12px', px: { xs: 1, sm: 2 } }}>
+          {/* Phones: the time column is hidden, so show it here instead */}
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            component="div"
+            className="sm:hidden"
+          >
+            9:00 am
+          </Typography>
           <Typography
             variant="body1"
             component="span"
@@ -72,7 +96,16 @@ export default function CustomTimeline() {
           </TimelineDot>
           <TimelineConnector />
         </TimelineSeparator>
-        <TimelineContent sx={{ py: '12px', px: 2 }}>
+        <TimelineContent sx={{ py: '12px', px: { xs: 1, sm: 2 } }}>
+          {/* Phones: the time column is hidden, so show it here instead */}
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            component="div"
+            className="sm:hidden"
+          >
+            11:00 am
+          </Typography>
           <Typography
             variant="body1"
             component="span"

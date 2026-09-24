@@ -78,7 +78,7 @@ function PostDetail({ id }: { id: string }) {
   }, [post]);
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div className="p-6 text-center text-sm text-red-600 dark:text-red-400">Error: {error}</div>;
   }
 
   if (!post) {
@@ -116,9 +116,9 @@ function PostDetail({ id }: { id: string }) {
   };
 
   return (
-    <div className="flex flex-col h-full max-w-6xl w-full mx-auto p-5">
-      <div className="flex items-center justify-between w-full">
-        <h1 className="text-3xl font-bold">{post.Name}</h1>
+    <div className="mx-auto flex min-h-full w-full max-w-6xl flex-col px-3 py-4 sm:p-5">
+      <div className="flex w-full flex-wrap items-center justify-between gap-3">
+        <h1 className="break-words text-2xl font-bold sm:text-3xl">{post.Name}</h1>
         {post.status === 'pending' && (
           <Button
             onClick={() => handleCloseIssue(post._id)}
@@ -135,7 +135,7 @@ function PostDetail({ id }: { id: string }) {
           </Button>
         )}
       </div>
-      <div className="grid grid-cols-3 gap-3 mt-5">
+      <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <div className="max-w-sm w-full rounded-md border flex flex-col gap-3 border-gray-400 p-3">
           <div className="flex items-center justify-between w-full gap-5">
             <h2 className="text-lg font-semibold">Preferred way of contact</h2>
@@ -189,7 +189,7 @@ function PostDetail({ id }: { id: string }) {
           </p>
         </div>
       </div>
-      <div className="flex items-center w-full mt-5 gap-3">
+      <div className="mt-5 flex w-full flex-col gap-3 lg:flex-row">
         <div className="rounded-md w-full">
           <GoogleMap
             lat={lat}
@@ -199,7 +199,7 @@ function PostDetail({ id }: { id: string }) {
             zoom={15}
           />
         </div>
-        <div className="rounded-md h-[370px] w-full p-4 border border-gray-400">
+        <div className="h-[370px] w-full overflow-y-auto rounded-md border border-gray-400 p-3 sm:p-4">
           <h1 className="text-center text-lg font-semibold mb-4">
             Recent Activities
           </h1>

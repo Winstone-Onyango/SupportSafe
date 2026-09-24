@@ -42,13 +42,25 @@ function AppShell({ children }: { children: ReactNode }) {
           enableSystem
           disableTransitionOnChange
         >
-          {/* Full-height column: navbar on top, page content fills the rest */}
-          <div className="h-screen flex flex-col">
+          {/* Full-height column: navbar on top, page content fills the rest.
+              `app-viewport` uses 100dvh where supported so phones do not hide
+              the bottom of the page behind the browser address bar. */}
+          <div className="app-viewport flex flex-col">
             <Navbar />
-            <main className="flex flex-1 flex-col">{children}</main>
+            <main className="flex min-h-0 flex-1 flex-col">
+              {children}
+            </main>
           </div>
           {/* Toast portal (success/error popups) */}
-          <Toaster />
+          <Toaster
+            toastOptions={{
+              // Keep long safety messages inside a small phone screen
+              style: {
+                maxWidth: 'calc(100vw - 2rem)',
+                fontSize: '0.9rem',
+              },
+            }}
+          />
         </ThemeProvider>
       </body>
     </html>

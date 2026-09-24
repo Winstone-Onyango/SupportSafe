@@ -151,11 +151,28 @@ export function InputForm({
     }
   }
 
+  // Toggles one preferred-contact option. Shared by the checkbox and its label
+  // so the whole row is tappable on a phone (min 44px touch target).
+  const toggleContactMethod = (
+    method: string,
+    checked: boolean,
+    onChange: (value: string[]) => void
+  ) => {
+    // Read the live value so rapid taps can never double-add an option
+    const current = form.getValues('preferredContact');
+    const newValue = checked
+      ? [...current, method]
+      : current.filter((item) => item !== method);
+    // Same field update as before: keeps validation/dirty state untouched
+    onChange(newValue);
+    setSelectedContactMethods(newValue);
+  };
+
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="max-w-2xl mx-auto space-y-6 w-full"
+        className="max-w-2xl mx-auto space-y-5 sm:space-y-6 w-full"
       >
         <FormField
           control={form.control}
@@ -178,9 +195,37 @@ export function InputForm({
             <FormItem>
               <FormLabel>Preferred Contact Method</FormLabel>
               <FormControl>
-                <div className="space-y-2">
+                <div className="space-y-1">
                   {contactMethods.map((method) => (
-                    <div key={method} className="flex items-center gap-2">
+                    // The whole row is tappable so choosing a contact method is
+                    // comfortable on a phone (not just the small checkbox).
+                    <div
+                      key={method}
+                      role="presentation"
+                      onClick={(event) => {
+                        // Taps on the checkbox itself are handled by
+                        // onCheckedChange — ignore them here to avoid a double toggle.
+                        if (
+                          (event.target as HTMLElement).closest(
+                            '[role="checkbox"]'
+                          )
+                        ) {
+                          return;
+                        }
+                        toggleContactMethod(
+                          method,
+                          !field.value.includes(
+                            method as
+                              | 'Phone'
+                              | 'Email'
+                              | 'Text message'
+                              | 'In-person'
+                          ),
+                          field.onChange
+                        );
+                      }}
+                      className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-md px-1 py-1.5 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-slate-800 dark:active:bg-slate-700"
+                    >
                       <Checkbox
                         checked={field.value.includes(
                           method as
@@ -189,15 +234,15 @@ export function InputForm({
                             | 'Text message'
                             | 'In-person'
                         )}
-                        onCheckedChange={(checked) => {
-                          const newValue = checked
-                            ? [...field.value, method]
-                            : field.value.filter((item) => item !== method);
-                          field.onChange(newValue);
-                          setSelectedContactMethods(newValue);
-                        }}
+                        onCheckedChange={(checked) =>
+                          toggleContactMethod(
+                            method,
+                            Boolean(checked),
+                            field.onChange
+                          )
+                        }
                       />
-                      <span>{method}</span>
+                      <span className="select-none">{method}</span>
                     </div>
                   ))}
                 </div>
@@ -215,7 +260,12 @@ export function InputForm({
               <FormItem>
                 <FormLabel>Phone</FormLabel>
                 <FormControl>
-                  <Input placeholder="Your phone number" {...field} />
+                  <Input
+                    placeholder="Your phone number"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -253,7 +303,7 @@ export function InputForm({
               <Button
                 type="button"
                 onClick={getUserLocation}
-                className="mt-2 flex items-center gap-2"
+                className="mt-2 flex w-full items-center justify-center gap-2 sm:w-auto"
                 variant={'outline'}
               >
                 <LocateIcon className="h-5 w-5" />
@@ -271,7 +321,7 @@ export function InputForm({
             <FormItem>
               <FormLabel>How long has it been occurring</FormLabel>
               <FormControl>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <Slider
                     {...field}
                     value={[occurrenceDuration]}
@@ -283,7 +333,10 @@ export function InputForm({
                       field.onChange(value[0]);
                     }}
                   />
-                  <span>{occurrenceDuration} months</span>
+                  {/* Fixed-width, non-wrapping value so the slider never squashes */}
+                  <span className="min-w-[4.75rem] whitespace-nowrap text-right text-sm tabular-nums">
+                    {occurrenceDuration} months
+                  </span>
                 </div>
               </FormControl>
               <FormMessage />
@@ -298,7 +351,7 @@ export function InputForm({
             <FormItem>
               <FormLabel>Frequency of Incidents</FormLabel>
               <FormControl>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <Slider
                     {...field}
                     value={[frequency]}
@@ -310,7 +363,9 @@ export function InputForm({
                       field.onChange(value[0]);
                     }}
                   />
-                  <span>{frequency} times</span>
+                  <span className="min-w-[4.75rem] whitespace-nowrap text-right text-sm tabular-nums">
+                    {frequency} times
+                  </span>
                 </div>
               </FormControl>
               <FormMessage />
@@ -352,9 +407,10 @@ export function InputForm({
           )}
         />
 
+        {/* Submit: full-width on phones, compact on wider screens */}
         <Button
           type="submit"
-          className="flex items-center gap-2 duration-200 ease-in-out"
+          className="flex w-full items-center justify-center gap-2 duration-200 ease-in-out sm:w-auto"
         >
           Generate Text
           <Loader2

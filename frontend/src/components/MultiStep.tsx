@@ -62,15 +62,40 @@ export default function HorizontalLinearStepper({
   }, [activeStep, poem]);
 
   return (
-    <div className="max-w-4xl mx-auto w-full px-2 sm:px-4 mt-4 sm:mt-6">
-      {/* The stepper itself: highlights the current step */}
-      <Stepper activeStep={activeStep}>
-        {steps.map((label) => (
-          <Step key={label}>
-            <StepLabel>{label}</StepLabel>
-          </Step>
-        ))}
-      </Stepper>
+    <div className="max-w-4xl mx-auto w-full px-2 sm:px-4 mt-2 sm:mt-6">
+      {/* Phones: a compact "Step X of 4" header with a progress bar, so labels
+          never squeeze into an unreadable horizontal stepper. */}
+      <div className="sm:hidden">
+        <div className="flex items-center justify-between gap-2 text-xs font-semibold">
+          <span className="whitespace-nowrap text-gray-500 dark:text-gray-400">
+            Step {Math.min(activeStep + 1, steps.length)} of {steps.length}
+          </span>
+          <span className="text-right text-blue-700 dark:text-blue-300">
+            {steps[Math.min(activeStep, steps.length - 1)]}
+          </span>
+        </div>
+        {/* Progress bar mirrors the completed steps */}
+        <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-slate-700">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-300 ease-out"
+            style={{
+              width: `${(Math.min(activeStep, steps.length) / steps.length) * 100}%`,
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Tablet / desktop: the full Material UI stepper */}
+      <div className="hidden sm:block">
+        <Stepper activeStep={activeStep}>
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+      </div>
+
       {activeStep === steps.length ? (
         // All steps completed: show a success message and the poem
         <Box
@@ -79,24 +104,30 @@ export default function HorizontalLinearStepper({
           justifyContent="center"
           alignItems="center"
           mt={4}
+          px={1}
         >
-          <div className="flex items-center gap-1">
+          {/* Icon + message stack on phones, sit side by side on wider screens */}
+          <div className="flex flex-col items-center gap-2 sm:flex-row">
             <CheckCircleIcon style={{ fontSize: 60, color: 'green' }} />
-            <Typography sx={{ ml: 2 }} variant="h5">
+            <Typography
+              sx={{ ml: { xs: 0, sm: 2 }, textAlign: 'center' }}
+              variant="h5"
+            >
               Post successfully submitted!
             </Typography>
           </div>
           {poem && (
             <Box
               mt={4}
-              p={4}
+              p={{ xs: 2, sm: 4 }}
               sx={{
                 fontFamily: 'Georgia, serif',
-                fontSize: '1.2rem',
+                fontSize: { xs: '1rem', sm: '1.2rem' },
                 backgroundColor: '#f9f9f9',
                 borderLeft: '4px solid #4CAF50',
                 color: '#555',
                 textAlign: 'center',
+                width: '100%',
                 maxWidth: '600px',
                 whiteSpace: 'pre-line',
               }}
@@ -112,7 +143,7 @@ export default function HorizontalLinearStepper({
         </Box>
       ) : (
         // Still in progress: render the content for the current step
-        <Box sx={{ mt: 2, mb: 1 }}>{stepContent[activeStep]}</Box>
+        <Box sx={{ mt: 2.5, mb: 1 }}>{stepContent[activeStep]}</Box>
       )}
     </div>
   );

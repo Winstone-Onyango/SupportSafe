@@ -70,7 +70,7 @@ function Page() {
   ];
 
   return (
-    <div className="flex items-center justify-center px-4 py-8 sm:py-12">
+    <div className="flex items-start sm:items-center justify-center px-1 py-4 sm:px-4 sm:py-12">
       {/* The wizard: renders the stepper + the current step's content */}
       <HorizontalLinearStepper
         activeStep={activeStep}

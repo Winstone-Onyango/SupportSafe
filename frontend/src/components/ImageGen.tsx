@@ -90,7 +90,7 @@ export default function ImageGen({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="max-w-4xl mx-auto space-y-6 sm:space-y-9 w-full px-2 sm:px-4"
+        className="max-w-4xl mx-auto space-y-5 sm:space-y-9 w-full px-1 sm:px-4"
       >
         <FormField
           control={form.control}
@@ -105,9 +105,9 @@ export default function ImageGen({
                       <div
                         key={index}
                         onClick={() => handleTextOptionClick(textOption)}
-                        className="cursor-pointer rounded-md border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 p-3 hover:bg-slate-100 dark:hover:bg-slate-600/50 transition-colors duration-150"
+                        className="cursor-pointer rounded-md border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 p-3 hover:bg-slate-100 active:bg-slate-200 dark:hover:bg-slate-600/50 dark:active:bg-slate-600/70 transition-colors duration-150"
                       >
-                        <p className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words max-h-40 overflow-y-auto">
+                        <p className="max-h-40 overflow-y-auto whitespace-pre-wrap break-words text-[13px] leading-relaxed text-slate-800 dark:text-slate-200 sm:text-sm">
                           {textOption}
                         </p>
                       </div>
@@ -115,7 +115,7 @@ export default function ImageGen({
                   </div>
                 ) : (
                   <div className="relative w-full rounded-md border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 p-3">
-                    <p className="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap break-words max-h-56 overflow-y-auto pr-2">
+                    <p className="max-h-56 overflow-y-auto whitespace-pre-wrap break-words pr-2 text-[13px] leading-relaxed text-slate-800 dark:text-slate-200 sm:text-sm">
                       {selectedText}
                     </p>
                   </div>
@@ -145,7 +145,7 @@ export default function ImageGen({
                     key={index}
                     type="button"
                     onClick={() => handleSuggestionClick(suggestion)}
-                    className="bg-slate-200 text-slate-700 text-sm px-3 py-1 rounded-xl hover:bg-slate-300 transition duration-150"
+                    className="rounded-xl bg-slate-200 px-3 py-2 text-sm text-slate-700 transition duration-150 hover:bg-slate-300 active:bg-slate-400 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 dark:active:bg-slate-500"
                   >
                     {suggestion}
                   </button>

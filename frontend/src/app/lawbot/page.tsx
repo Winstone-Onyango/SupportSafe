@@ -18,15 +18,15 @@ const ChatSchema = z.object({
 type ChatFormValues = z.infer<typeof ChatSchema>;
 
 const promptSuggestions = [
-  { text: 'Kenyan Law', icon: <Scale className="text-gray-700" size={16} /> },
+  { text: 'Kenyan Law', icon: <Scale className="text-gray-700 dark:text-gray-300" size={16} /> },
   {
     text: 'Kenyan Penal Code Section 4 (Chapter 63)',
-    icon: <Triangle className="text-gray-700" size={16} />,
+    icon: <Triangle className="text-gray-700 dark:text-gray-300" size={16} />,
   },
-  { text: 'Human Rights', icon: <Check className="text-gray-700" size={16} /> },
+  { text: 'Human Rights', icon: <Check className="text-gray-700 dark:text-gray-300" size={16} /> },
   {
     text: 'Personal Safety',
-    icon: <Fingerprint className="text-gray-700" size={16} />,
+    icon: <Fingerprint className="text-gray-700 dark:text-gray-300" size={16} />,
   },
 ];
 
@@ -86,31 +86,33 @@ function LawBotContent() {
 
   if (messages.length === 0) {
     return (
-      <div className="h-full flex flex-col items-center justify-center">
-        <h1 className="text-3xl font-extrabold tracking-wide text-gray-700 mb-5">
+      <div className="flex h-full w-full flex-col items-center justify-center px-4 py-8 text-center">
+        <h1 className="mb-5 text-2xl font-extrabold tracking-wide text-gray-700 dark:text-gray-100 sm:text-3xl">
           {typingText}
         </h1>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex items-center max-w-3xl w-full gap-2"
         >
-          <div className="rounded-3xl flex w-full items-center bg-slate-100 border border-gray-300 p-1">
+          <div className="flex w-full items-center rounded-3xl border border-gray-300 bg-slate-100 p-1 dark:border-slate-600 dark:bg-slate-800">
             <Input
               {...form.register('message')}
-              className="focus-within:ring-0 ring-offset-transparent text-lg focus-visible:ring-0 bg-slate-100 rounded-3xl focus-visible:ring-transparent p-5 border-none"
+              className="border-none bg-slate-100 p-4 text-base focus-visible:ring-0 focus-visible:ring-transparent focus-within:ring-0 ring-offset-transparent dark:bg-slate-800 dark:text-gray-100 sm:p-5 sm:text-lg"
               placeholder="Chat with Law Bot"
               autoComplete="off"
             />
             <Button
-              className="bg-slate-300 rounded-full text-black cursor-pointer"
+              className="shrink-0 cursor-pointer rounded-full bg-slate-300 text-black dark:bg-slate-600 dark:text-gray-100"
               disabled={isThinking || !form.formState.isValid}
               type="submit"
+              aria-label="Send message"
             >
               <ArrowUp size={24} />
             </Button>
           </div>
         </form>
-        <div className="mt-5 flex items-center gap-5">
+        {/* Suggestion chips wrap onto as many lines as the phone needs */}
+        <div className="mt-5 flex w-full max-w-3xl flex-wrap items-center justify-center gap-2 sm:gap-3">
           {promptSuggestions.map((prompt, index) => (
             <button
               key={index}
@@ -119,9 +121,11 @@ function LawBotContent() {
                   typeof prompt === 'string' ? prompt : prompt.text
                 )
               }
-              className="flex items-center gap-2 border border-gray-300 rounded-full px-4 py-2 text-sm hover:bg-gray-100"
+              className="flex max-w-full items-center gap-2 rounded-full border border-gray-300 px-3 py-2 text-left text-xs transition-colors hover:bg-gray-100 active:bg-gray-200 dark:border-slate-600 dark:text-gray-100 dark:hover:bg-slate-800 dark:active:bg-slate-700 sm:px-4 sm:text-sm"
             >
-              {typeof prompt !== 'string' && prompt.icon}
+              {typeof prompt !== 'string' && (
+                <span className="shrink-0">{prompt.icon}</span>
+              )}
               {typeof prompt === 'string' ? prompt : prompt.text}
             </button>
           ))}
@@ -131,82 +135,90 @@ function LawBotContent() {
   }
 
   return (
-    <div className="flex flex-col h-full items-center justify-center max-w-3xl w-full mx-auto ">
-      <div className="w-full overflow-y-auto rounded-md custom-scrollbar ">
-        <div className="flex flex-col gap-2 h-[80vh] overflow-y-auto custom-scrollbar p-4">
-          {messages.length > 0 &&
-            messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex items-start gap-2 ${
-                  message.isUser ? 'justify-end' : ''
-                }`}
-              >
-                {!message.isUser && (
-                  <div
-                    aria-label="SupportSafe Bot Avatar"
-                    className="shrink-0 h-11 w-11 rounded-full bg-gradient-to-br from-blue-700 to-indigo-700 text-white flex items-center justify-center font-bold text-lg shadow-sm border border-blue-800"
-                  >
-                    S
-                  </div>
-                )}
+    <div className="flex h-full w-full flex-col items-center">
+      {/* One column that fills the page: transcript scrolls, composer stays put */}
+      <div className="flex h-full w-full max-w-3xl flex-col px-2 sm:px-4">
+        <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto pt-3">
+          <div className="flex flex-col gap-2 pb-2">
+            {messages.length > 0 &&
+              messages.map((message, index) => (
                 <div
-                  className={`py-2 px-3 rounded-md max-w-[70%] ${
-                    message.isUser
-                      ? 'bg-green-500 text-white self-end'
-                      : 'bg-gray-300 text-black self-start'
+                  key={index}
+                  className={`flex items-start gap-2 ${
+                    message.isUser ? 'justify-end' : ''
                   }`}
                 >
-                  {message.isUser ? (
-                    message.text
-                  ) : (
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                      {message.text}
-                    </ReactMarkdown>
+                  {!message.isUser && (
+                    <div
+                      aria-label="SupportSafe Bot Avatar"
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-blue-800 bg-gradient-to-br from-blue-700 to-indigo-700 text-sm font-bold text-white shadow-sm sm:h-11 sm:w-11 sm:text-lg"
+                    >
+                      S
+                    </div>
+                  )}
+                  <div
+                    className={`max-w-[85%] break-words rounded-2xl px-3 py-2 text-sm leading-relaxed sm:max-w-[75%] sm:text-base ${
+                      message.isUser
+                        ? 'bg-green-500 text-white self-end'
+                        : 'bg-gray-200 text-black self-start dark:bg-slate-700 dark:text-gray-100'
+                    }`}
+                  >
+                    {message.isUser ? (
+                      message.text
+                    ) : (
+                      // Markdown from the bot: tables/code scroll instead of
+                      // bursting out of the bubble on a narrow screen.
+                      <div className="max-w-full break-words [&_a]:break-all [&_code]:break-all [&_img]:max-w-full [&_pre]:overflow-x-auto [&_table]:block [&_table]:max-w-full [&_table]:overflow-x-auto">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {message.text}
+                        </ReactMarkdown>
+                      </div>
+                    )}
+                  </div>
+
+                  {message.isUser && (
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border shadow-sm sm:h-10 sm:w-10">
+                      <h1 className="text-sm font-semibold sm:text-base">G</h1>
+                    </div>
                   )}
                 </div>
+              ))}
 
-                {message.isUser && (
-                  <div className="rounded-full border shadow-sm h-10 w-10 flex items-center justify-center ">
-                    <h1 className="font-semibold">G</h1>
-                  </div>
-                )}
+            {isThinking && (
+              <div className="flex items-center space-x-4">
+                <Skeleton className="h-10 w-10 rounded-full sm:h-12 sm:w-12" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-40 sm:w-[250px]" />
+                  <Skeleton className="h-4 w-28 sm:w-[200px]" />
+                </div>
               </div>
-            ))}
-
-          {isThinking && (
-            <div className="flex items-center space-x-4">
-              <Skeleton className="h-12 w-12 rounded-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-[250px]" />
-                <Skeleton className="h-4 w-[200px]" />
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-      {messages.length > 0 && (
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="flex items-center max-w-3xl w-full gap-2"
-        >
-          <div className="rounded-3xl flex w-full items-center border bg-slate-100 border-gray-300 p-1">
-            <Input
-              {...form.register('message')}
-              className="focus-within:ring-0 ring-offset-transparent text-lg bg-slate-100 focus-visible:ring-0 rounded-3xl focus-visible:ring-transparent p-5 border-none"
-              placeholder="Chat with Law Bot"
-              autoComplete="off"
-            />
-            <Button
-              className="bg-slate-300 rounded-full text-black cursor-pointer"
-              disabled={isThinking || !form.formState.isValid}
-              type="submit"
-            >
-              <ArrowUp size={24} />
-            </Button>
+            )}
           </div>
-        </form>
-      )}
+        </div>
+        {messages.length > 0 && (
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex w-full items-center gap-2 py-2 sm:py-3"
+          >
+            <div className="flex w-full items-center rounded-3xl border border-gray-300 bg-slate-100 p-1 dark:border-slate-600 dark:bg-slate-800">
+              <Input
+                {...form.register('message')}
+                className="rounded-3xl border-none bg-slate-100 p-4 text-base focus-visible:ring-0 focus-visible:ring-transparent focus-within:ring-0 ring-offset-transparent dark:bg-slate-800 dark:text-gray-100 sm:p-5 sm:text-lg"
+                placeholder="Chat with Law Bot"
+                autoComplete="off"
+              />
+              <Button
+                className="shrink-0 cursor-pointer rounded-full bg-slate-300 text-black dark:bg-slate-600 dark:text-gray-100"
+                disabled={isThinking || !form.formState.isValid}
+                type="submit"
+                aria-label="Send message"
+              >
+                <ArrowUp size={24} />
+              </Button>
+            </div>
+          </form>
+        )}
+      </div>
     </div>
   );
 }

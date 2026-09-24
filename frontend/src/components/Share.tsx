@@ -119,19 +119,19 @@ function Share({ imageURL, resText, setShared }: ShareProps) {
   };
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      {/* Adjusted Image size */}
-      <div className="relative w-[500px] h-[500px]">
+    <div className="flex w-full flex-col items-center gap-3">
+      {/* Image preview: fluid square that never exceeds the screen width */}
+      <div className="relative aspect-square w-full max-w-[500px]">
         <Image
           src={imageURL}
           alt="Generated Image"
-          layout="fill"
-          objectFit="cover"
-          className="rounded-md"
+          fill
+          sizes="(max-width: 640px) 100vw, 500px"
+          className="rounded-md object-cover"
         />
       </div>
 
-      <p className="text-sm text-gray-600 dark:text-gray-300 max-w-lg text-center">
+      <p className="max-w-lg px-1 text-center text-xs text-gray-600 dark:text-gray-300 sm:text-sm">
         When you press a share button below, your message is first{' '}
         <span className="font-semibold">hidden inside the image</span> and the
         post automatically includes{' '}
@@ -141,13 +141,18 @@ function Share({ imageURL, resText, setShared }: ShareProps) {
         . Always share the image link, not a screenshot.
       </p>
 
-      <div className="flex flex-wrap items-center justify-center gap-4">
+      {/* Buttons stack full-width on phones and sit in a row on wider screens */}
+      <div className="flex w-full flex-col items-stretch justify-center gap-3 px-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
         {encoding ? (
-          <Button variant="default" disabled>
+          <Button variant="default" disabled className="w-full sm:w-auto">
             Hiding your message...
           </Button>
         ) : !encoded ? (
-          <Button variant="default" onClick={handleCommonFunction}>
+          <Button
+            variant="default"
+            onClick={handleCommonFunction}
+            className="flex w-full items-center justify-center gap-2 sm:w-auto"
+          >
             <ShareIcon size={24} />
             Prepare Image for Sharing
           </Button>
@@ -155,7 +160,7 @@ function Share({ imageURL, resText, setShared }: ShareProps) {
           <>
             <Button
               variant="default"
-              className="flex items-center gap-2"
+              className="flex w-full items-center justify-center gap-2 sm:w-auto"
               onClick={handleShareTelegram}
             >
               <ShareIcon size={24} />
@@ -163,7 +168,7 @@ function Share({ imageURL, resText, setShared }: ShareProps) {
             </Button>
             <Button
               variant="default"
-              className="flex items-center gap-2 bg-black text-white"
+              className="flex w-full items-center justify-center gap-2 bg-black text-white sm:w-auto"
               onClick={handleShareTwitter}
             >
               <ShareIcon size={24} />
