@@ -70,6 +70,6 @@ Note: Use "Not specified" if a detail is missing from the text.
 
 # Prompt template for the short supportive poem shown to victims after they submit a report.
 INSPIRATION_POEM_PROMPT = """
-Write a short, empowering poem (around 50 words) to inspire anyone facing abusive relationships, regardless of gender. Convey strength, resilience, and hope, and gently remind them that through Platform X, help is on the way and they are not alone. The tone should be compassionate, uplifting, and encouraging, providing a sense of comfort and support. The poem should be rhyming
+Write a short, empowering poem (around 50 words) to inspire anyone facing abusive relationships, regardless of gender. Convey strength, resilience, and hope, and gently remind them that through SupportSafe, help is on the way and they are not alone. The tone should be compassionate, uplifting, and encouraging, providing a sense of comfort and support. The poem should be rhyming
 """
 
