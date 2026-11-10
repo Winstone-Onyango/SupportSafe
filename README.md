@@ -92,7 +92,15 @@ A survivor types a few keywords about their situation. An LLM expands them into 
 ### 2️⃣ Confidential Legal AI
 *Demystifying Kenyan Statutes.*
 
+<<<<<<< HEAD
 Powered by **Retrieval-Augmented Generation (RAG)**, the Legal Rights Bot provides instant, plain-language guidance grounded in actual Kenyan law.
+=======
+Navigating the legal system is intimidating. Our AI Legal Rights Bot provides:
+- **Protection Orders:** Plain-language explanations of how to file and enforce Protection Orders under the Kenyan *Protection Against Domestic Violence Act*.
+- **Custody & Rights:** Instant, clear assistance regarding child custody, co-parenting structures, and custody rights during emergency separation.
+- **Safe Referral Network:** Vetted referrals to pro-bono law organizations and GBV hotlines in Kenya.
+![alt text](<Screenshot 2026-09-11 184202.png>)
+>>>>>>> 1ee3804834924fca33fda33f9f9e11ad1ae27535
 
 **How It Works:**
 - Key legal document (The Constitution) is chunked and stored as vector embeddings in MongoDB Atlas.
@@ -121,6 +129,15 @@ Powered by **Retrieval-Augmented Generation (RAG)**, the Legal Rights Bot provid
 
 ![alt text](<AI Support companion-1.png>)
 
+<<<<<<< HEAD
+=======
+Due to severe social stigma, many survivors never seek traditional therapy. Our AI companion serves as a secure, confidential first point of contact.
+- **Instant Grounding Techniques:** Interactive guidance on deep breathing, calming exercises, and cognitive refocusing during acute distress.
+- **Trauma-Informed Responses:** Carefully tuned conversational paths that offer validation, reduce guilt, and foster emotional safety.
+- **No Judgment:** Available 24/7, it never judges, breaks confidentiality, or carries bias.
+<img width="1917" height="907" alt="Screenshot 2026-09-17 184130" src="https://github.com/user-attachments/assets/08f7aedb-2df8-45ca-b52a-84c14e2c2770" />
+
+>>>>>>> 1ee3804834924fca33fda33f9f9e11ad1ae27535
 ---
 
 ## 🏗 System Architecture
