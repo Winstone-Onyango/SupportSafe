@@ -4,6 +4,7 @@ import * as React from 'react';
 import {
   AlertTriangle,
   CalendarDays,
+  CheckCircle2,
   ChevronDown,
   ChevronUp,
   FileUser,
@@ -214,6 +215,7 @@ function SavedReports() {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState('');
   const [expandedId, setExpandedId] = React.useState<string | null>(null);
+  const [resolvingId, setResolvingId] = React.useState<string | null>(null);
   const [geoCache, setGeoCache] = React.useState<
     Record<string, { lat: number; lng: number } | null>
   >({});
@@ -278,6 +280,48 @@ function SavedReports() {
     setExpandedId(expandedId === id ? null : id);
   };
 
+  // Optimistically mark a report as resolved, then refresh the full list
+  const markResolved = React.useCallback(
+    async (id: string) => {
+      // Ask the admin to confirm before closing a report
+      if (!window.confirm('Mark this report as resolved and close it?')) return;
+
+      setResolvingId(id);
+      try {
+        const token = getToken();
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+        };
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        const res = await fetch('/api/closeIssue', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ issueId: id }),
+        });
+
+        if (res.ok) {
+          // Optimistically flip the status so the UI responds instantly
+          setReports((prev) =>
+            prev
+              ? prev.map((r) =>
+                  r._id === id ? { ...r, status: 'closed' } : r
+                )
+              : prev
+          );
+        } else {
+          setError('Could not mark report as resolved');
+        }
+      } catch {
+        setError('Could not reach the server');
+      } finally {
+        setResolvingId(null);
+      }
+    },
+    []
+  );
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -321,6 +365,8 @@ function SavedReports() {
             report={report}
             expanded={expandedId === report._id}
             onToggle={() => toggleExpand(report._id)}
+            onMarkResolved={markResolved}
+            isResolving={resolvingId === report._id}
             geo={geoCache[report.location] ?? parseCoordinates(report.location) ?? null}
           />
         ))}
@@ -338,11 +384,15 @@ function ReportCard({
   report,
   expanded,
   onToggle,
+  onMarkResolved,
+  isResolving,
   geo,
 }: {
   report: SavedReport;
   expanded: boolean;
   onToggle: () => void;
+  onMarkResolved: (id: string) => void;
+  isResolving: boolean;
   geo: { lat: number; lng: number } | null;
 }) {
   const hasCoords = geo && geo.lat !== undefined && geo.lng !== undefined;
@@ -370,6 +420,17 @@ function ReportCard({
           >
             {report.status}
           </span>
+          {report.status !== 'closed' &&
+            report.status !== 'resolved' && (
+              <button
+                onClick={() => onMarkResolved(report._id)}
+                disabled={isResolving}
+                className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/40 dark:hover:bg-green-900/60 dark:text-green-300 transition-colors disabled:opacity-50 disabled:cursor-wait"
+              >
+                <CheckCircle2 size={12} />
+                {isResolving ? 'Closing…' : 'Mark Resolved'}
+              </button>
+            )}
           {report.source && (
             <span className="text-[10px] px-2 py-1 rounded-full bg-gray-100 text-gray-500 dark:bg-slate-700 dark:text-gray-400">
               via {report.source}

@@ -156,7 +156,7 @@ export default function SignInForm() {
 
         {/* Footer note clarifying this is admin-only */}
         <p className="text-center text-sm text-gray-600 dark:text-gray-300 mt-6">
-          For admin access only — no registration required.
+          For Admin access only.
         </p>
       </div>
     </div>
