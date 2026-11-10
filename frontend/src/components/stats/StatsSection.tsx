@@ -93,7 +93,7 @@ const StatsSection: React.FC<StatsSectionProps> = ({ stats, flowImages }) => {
 
                   <div className="absolute inset-x-0 bottom-0 p-4 text-white">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#f7e5d8]">
-                      Real story / warning sign
+                      Real story
                     </p>
                   </div>
                 </article>

@@ -59,6 +59,21 @@ export default function Home() {
       {/* Statistics Section with GBV Images */}
       <StatsSection stats={statsData} flowImages={heroImages} />
 
+      <section className="bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto space-y-6">
+          <blockquote className="border-l-4 border-rose-400 pl-5 italic text-lg md:text-xl lg:text-2xl leading-relaxed text-slate-700">
+            “I firmly believe today that the only way to stop violence against women is to speak out and refused to be silenced.”
+            <span className="mt-3 block text-sm md:text-base font-medium not-italic text-slate-500">
+              — Zainab Salbi
+            </span>
+          </blockquote>
+
+          <p className="text-center text-sm md:text-base italic text-slate-600 tracking-wide">
+            Healing begins when you know you don&apos;t have to face it alone.
+          </p>
+        </div>
+      </section>
+
       {/* Footer */}
       <Footer />
     </main>
