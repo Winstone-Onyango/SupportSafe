@@ -26,6 +26,7 @@
     "@radix-ui/react-slider": "^1.2.1",
     "@radix-ui/react-slot": "^1.1.0",
     "@react-three/drei": "^9.115.0",
+    "@react-three/fiber": "^8.17.10",
     "@tanstack/react-table": "^8.20.5",
     "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
