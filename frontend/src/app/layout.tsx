@@ -15,7 +15,7 @@ import { Toaster } from 'react-hot-toast';
 
 // SEO metadata shared by all pages
 export const metadata: Metadata = {
-  title: 'SupportSafe — Confidential Safety Support for Everyone',
+  title: 'SupportSafe',
   description: 'SupportSafe is a discreet AI companion for anyone facing abuse. Get help, confidential guidance, mental health support, and legal advice — regardless of gender.',
 };
 
