@@ -8,7 +8,7 @@ import Footer from '@/components/footer/Footer';
 const heroImages = [
   '/assets/Seeking%20help.jpg',
   '/assets/AI%20companion.jpg',
-  '/assets/banner.png',
+  '/assets/banner.jpg',
   '/assets/Therapy%20bot.jpg',
 ];
 

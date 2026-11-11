@@ -107,7 +107,7 @@ function Header() {
           <div className="flex-1 flex justify-center lg:justify-end w-full lg:w-auto">
             <div className="relative w-full max-w-md sm:max-w-lg lg:max-w-xl aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-200 dark:ring-gray-700">
               <Image
-                src="/banner.png"
+                src="/banner.jpg"
                 alt="SupportSafe — helping survivors safely"
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
