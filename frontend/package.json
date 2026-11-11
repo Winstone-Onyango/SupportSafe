@@ -25,9 +25,9 @@
     "@radix-ui/react-select": "^2.1.2",
     "@radix-ui/react-slider": "^1.2.1",
     "@radix-ui/react-slot": "^1.1.0",
+    "@react-spring/three": "^10.1.2",
     "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.2",
-    "@react-spring/three": "^10.1.2",
     "@tanstack/react-table": "^8.20.5",
     "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
@@ -54,13 +54,13 @@
   },
   "devDependencies": {
     "@types/leaflet": "^1.9.14",
-    "@types/node": "^20",
+    "@types/node": "20.19.43",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "eslint": "^8",
     "eslint-config-next": "15.0.2",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "5.9.3"
   }
 }
