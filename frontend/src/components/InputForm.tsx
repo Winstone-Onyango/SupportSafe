@@ -106,9 +106,6 @@ export function InputForm({
   const [occurrenceDuration, setOccurrenceDuration] = useState(0);
   const [frequency, setFrequency] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [selectedContactMethods, setSelectedContactMethods] = useState<
-    string[]
-  >([]);
 
   const getUserLocation = () => {
     if (navigator.geolocation) {
@@ -151,22 +148,10 @@ export function InputForm({
     }
   }
 
-  // Toggles one preferred-contact option. Shared by the checkbox and its label
-  // so the whole row is tappable on a phone (min 44px touch target).
-  const toggleContactMethod = (
-    method: string,
-    checked: boolean,
-    onChange: (value: string[]) => void
-  ) => {
-    // Read the live value so rapid taps can never double-add an option
-    const current = form.getValues('preferredContact');
-    const newValue = checked
-      ? [...current, method]
-      : current.filter((item) => item !== method);
-    // Same field update as before: keeps validation/dirty state untouched
-    onChange(newValue);
-    setSelectedContactMethods(newValue);
-  };
+  const selectedContactMethods =
+    Array.isArray(form.getValues('preferredContact'))
+      ? form.getValues('preferredContact')
+      : [];
 
   return (
     <Form {...form}>
@@ -196,55 +181,34 @@ export function InputForm({
               <FormLabel>Preferred Contact Method</FormLabel>
               <FormControl>
                 <div className="space-y-1">
-                  {contactMethods.map((method) => (
-                    // The whole row is tappable so choosing a contact method is
-                    // comfortable on a phone (not just the small checkbox).
-                    <div
-                      key={method}
-                      role="presentation"
-                      onClick={(event) => {
-                        // Taps on the checkbox itself are handled by
-                        // onCheckedChange — ignore them here to avoid a double toggle.
-                        if (
-                          (event.target as HTMLElement).closest(
-                            '[role="checkbox"]'
-                          )
-                        ) {
-                          return;
-                        }
-                        toggleContactMethod(
-                          method,
-                          !field.value.includes(
-                            method as
-                              | 'Phone'
-                              | 'Email'
-                              | 'Text message'
-                              | 'In-person'
-                          ),
-                          field.onChange
-                        );
-                      }}
-                      className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-md px-1 py-1.5 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-slate-800 dark:active:bg-slate-700"
-                    >
-                      <Checkbox
-                        checked={field.value.includes(
-                          method as
-                            | 'Phone'
-                            | 'Email'
-                            | 'Text message'
-                            | 'In-person'
-                        )}
-                        onCheckedChange={(checked) =>
-                          toggleContactMethod(
-                            method,
-                            Boolean(checked),
-                            field.onChange
-                          )
-                        }
-                      />
-                      <span className="select-none">{method}</span>
-                    </div>
-                  ))}
+                  {contactMethods.map((method) => {
+                    const isSelected = field.value.includes(
+                      method as
+                        | 'Phone'
+                        | 'Email'
+                        | 'Text message'
+                        | 'In-person'
+                    );
+
+                    return (
+                      <label
+                        key={method}
+                        className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-md px-1 py-1.5 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-slate-800 dark:active:bg-slate-700"
+                      >
+                        <Checkbox
+                          checked={isSelected}
+                          onCheckedChange={(checked) => {
+                            const nextValue = checked === true
+                              ? [...new Set([...field.value, method])]
+                              : field.value.filter((item) => item !== method);
+
+                            field.onChange(nextValue);
+                          }}
+                        />
+                        <span className="select-none">{method}</span>
+                      </label>
+                    );
+                  })}
                 </div>
               </FormControl>
               <FormMessage />

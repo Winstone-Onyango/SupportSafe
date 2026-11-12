@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import React from 'react';
 import { getCurrentUser, type AuthUser } from '@/lib/auth';
 
@@ -85,12 +86,18 @@ const HeroBackground: React.FC<HeroBackgroundProps> = ({
 
           {shouldShowCtaButtons && (
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-              <button className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-blue-900/30 transition hover:translate-y-[-1px] hover:shadow-xl hover:shadow-blue-900/40">
+              <Link
+                href="/create-post"
+                className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-blue-900/30 transition hover:translate-y-[-1px] hover:shadow-xl hover:shadow-blue-900/40"
+              >
                 Report Now
-              </button>
-              <button className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/5 px-6 py-3 text-base font-semibold text-white backdrop-blur-sm transition hover:bg-white hover:text-slate-900">
+              </Link>
+              <Link
+                href="/sign-in"
+                className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/5 px-6 py-3 text-base font-semibold text-white backdrop-blur-sm transition hover:bg-white hover:text-slate-900"
+              >
                 Sign In
-              </button>
+              </Link>
             </div>
           )}
         </div>
